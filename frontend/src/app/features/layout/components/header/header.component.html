@@ -1,0 +1,15 @@
+<header class="header">
+  <div class="header-container">
+    <a routerLink="/home" class="logo">BookWise</a>
+    <nav class="nav">
+      <a routerLink="/home" routerLinkActive="active" class="nav-link">Home</a>
+      @if (isLoggedIn()) {
+        <span class="welcome-text">{{ username() }}</span>
+        <p-button label="Logout" [text]="true" severity="secondary" (onClick)="onLogout()" />
+      } @else {
+        <a routerLink="/login" routerLinkActive="active" class="nav-link">Login</a>
+        <a routerLink="/register" routerLinkActive="active" class="nav-link">Register</a>
+      }
+    </nav>
+  </div>
+</header>

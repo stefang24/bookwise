@@ -1,0 +1,52 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-subtitle">Sign in to your BookWise account</p>
+    </div>
+
+    @if (errorMessage()) {
+      <p-message severity="error" [text]="errorMessage()" styleClass="w-full" />
+    }
+
+    <form (ngSubmit)="onLogin()" class="auth-form">
+      <div class="form-field">
+        <label for="email" class="form-label">Email</label>
+        <input
+          pInputText
+          id="email"
+          type="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          name="email"
+          placeholder="Enter your email"
+          class="w-full" />
+      </div>
+
+      <div class="form-field">
+        <label for="password" class="form-label">Password</label>
+        <p-password
+          id="password"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          name="password"
+          placeholder="Enter your password"
+          [feedback]="false"
+          [toggleMask]="true"
+          styleClass="w-full"
+          inputStyleClass="w-full" />
+      </div>
+
+      <p-button
+        type="submit"
+        label="Sign In"
+        styleClass="w-full"
+        [loading]="isLoading"
+        [disabled]="isLoading || !email() || !password()" />
+    </form>
+
+    <p class="auth-footer">
+      Don't have an account? <a routerLink="/register" class="auth-link">Sign up</a>
+    </p>
+  </div>
+</div>

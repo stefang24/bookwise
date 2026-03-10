@@ -1,0 +1,55 @@
+# ========================
+# Backend (.NET)
+# ========================
+backend/bin/
+backend/obj/
+backend/*.user
+backend/.vs/
+
+# ========================
+# Frontend (Angular)
+# ========================
+frontend/node_modules/
+frontend/dist/
+frontend/tmp/
+frontend/out-tsc/
+frontend/bazel-out/
+frontend/.angular/
+frontend/npm-debug.log
+frontend/yarn-error.log
+
+# ========================
+# IDEs and editors
+# ========================
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+.history/*
+
+# ========================
+# System files
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# Miscellaneous
+# ========================
+*.log
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
