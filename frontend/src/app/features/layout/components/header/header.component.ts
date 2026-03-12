@@ -14,6 +14,7 @@ export class HeaderComponent {
 
   isLoggedIn = computed<boolean>(() => this.authService.isLoggedIn());
   username = computed<string>(() => this.authService.username());
+  userId = computed<number | null>(() => this.authService.userId());
 
   onLogout(): void {
     this.authService.logout();

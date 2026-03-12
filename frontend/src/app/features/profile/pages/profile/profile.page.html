@@ -1,0 +1,201 @@
+<div class="profile-wrapper">
+  @if (isLoading) {
+    <div class="loading-container">
+      <i class="pi pi-spinner pi-spin" style="font-size: 2rem"></i>
+    </div>
+  } @else if (errorMessage() && !profile()) {
+    <p-message severity="error" [text]="errorMessage()" styleClass="w-full" />
+  } @else if (profile(); as p) {
+    <div class="profile-header">
+      <div class="profile-avatar-section">
+        <div class="avatar-container">
+          @if (profileImageUrl) {
+            <img [src]="profileImageUrl" alt="Profile" class="profile-image" />
+          } @else {
+            <p-avatar
+              [label]="p.firstName.charAt(0) + p.lastName.charAt(0)"
+              size="xlarge"
+              shape="circle"
+              styleClass="profile-avatar" />
+          }
+          @if (isOwnProfile && !isEditing()) {
+            <p-fileupload
+              mode="basic"
+              accept="image/*"
+              [maxFileSize]="5242880"
+              chooseLabel="Change Photo"
+              chooseIcon="pi pi-camera"
+              [auto]="true"
+              (onSelect)="onImageSelect($event)"
+              styleClass="upload-btn" />
+          }
+        </div>
+        <div class="profile-info">
+          <div class="profile-name-row">
+            <h1 class="profile-name">{{ p.firstName }} {{ p.lastName }}</h1>
+            <p-tag [value]="p.role" [severity]="p.role === 'Provider' ? 'info' : p.role === 'Admin' ? 'danger' : 'secondary'" />
+          </div>
+          <p class="profile-username">@{{ p.username }}</p>
+          @if (p.bio) {
+            <p class="profile-bio">{{ p.bio }}</p>
+          }
+          <p class="profile-joined">Joined {{ p.createdAt | date:'MMMM yyyy' }}</p>
+        </div>
+      </div>
+      <div class="profile-actions">
+        @if (isOwnProfile && !isEditing()) {
+          <p-button label="Edit Profile" icon="pi pi-pencil" [outlined]="true" (onClick)="startEditing()" />
+        }
+        @if (showChatButton) {
+          <p-button label="Chat" icon="pi pi-comments" (onClick)="null" />
+        }
+      </div>
+    </div>
+
+    @if (successMessage()) {
+      <p-message severity="success" [text]="successMessage()" styleClass="w-full message-spacing" />
+    }
+    @if (errorMessage()) {
+      <p-message severity="error" [text]="errorMessage()" styleClass="w-full message-spacing" />
+    }
+
+    @if (isEditing()) {
+      <div class="edit-form">
+        <h2 class="section-title">Edit Profile</h2>
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label">First Name</label>
+            <input pInputText [ngModel]="editForm().firstName" (ngModelChange)="updateField('firstName', $event)" class="w-full" />
+          </div>
+          <div class="form-field">
+            <label class="form-label">Last Name</label>
+            <input pInputText [ngModel]="editForm().lastName" (ngModelChange)="updateField('lastName', $event)" class="w-full" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Bio</label>
+          <textarea pTextarea [ngModel]="editForm().bio ?? ''" (ngModelChange)="updateField('bio', $event)" rows="3" class="w-full"></textarea>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Phone Number</label>
+          <input pInputText [ngModel]="editForm().phoneNumber ?? ''" (ngModelChange)="updateField('phoneNumber', $event)" class="w-full" />
+        </div>
+        @if (isProvider) {
+          <h3 class="section-subtitle">Company Information</h3>
+          <div class="form-field">
+            <label class="form-label">Company Name</label>
+            <input pInputText [ngModel]="editForm().companyName ?? ''" (ngModelChange)="updateField('companyName', $event)" class="w-full" />
+          </div>
+          <div class="form-field">
+            <label class="form-label">Company Description</label>
+            <textarea pTextarea [ngModel]="editForm().companyDescription ?? ''" (ngModelChange)="updateField('companyDescription', $event)" rows="4" class="w-full"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Address</label>
+              <input pInputText [ngModel]="editForm().address ?? ''" (ngModelChange)="updateField('address', $event)" class="w-full" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">Website</label>
+              <input pInputText [ngModel]="editForm().website ?? ''" (ngModelChange)="updateField('website', $event)" class="w-full" />
+            </div>
+          </div>
+        }
+        <h3 class="section-subtitle">Change Password</h3>
+        <div class="form-field">
+          <label class="form-label">Current Password</label>
+          <p-password
+            [ngModel]="editForm().currentPassword ?? ''"
+            (ngModelChange)="updateField('currentPassword', $event)"
+            [feedback]="false"
+            [toggleMask]="true"
+            placeholder="Enter current password"
+            styleClass="w-full"
+            inputStyleClass="w-full" />
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label">New Password</label>
+            <p-password
+              [ngModel]="editForm().newPassword ?? ''"
+              (ngModelChange)="updateField('newPassword', $event)"
+              [toggleMask]="true"
+              placeholder="Enter new password"
+              styleClass="w-full"
+              inputStyleClass="w-full" />
+          </div>
+          <div class="form-field">
+            <label class="form-label">Confirm New Password</label>
+            <p-password
+              [ngModel]="confirmNewPassword()"
+              (ngModelChange)="confirmNewPassword.set($event)"
+              [feedback]="false"
+              [toggleMask]="true"
+              placeholder="Confirm new password"
+              styleClass="w-full"
+              inputStyleClass="w-full" />
+            @if (passwordMismatch()) {
+              <small class="field-error">Passwords do not match</small>
+            }
+          </div>
+        </div>
+        <div class="form-actions">
+          <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="cancelEditing()" />
+          <p-button label="Save" icon="pi pi-check" [loading]="isSaving" [disabled]="passwordMismatch()" (onClick)="saveProfile()" />
+        </div>
+      </div>
+    } @else {
+      <p-tabs value="0">
+        <p-tablist>
+          <p-tab value="0">Info</p-tab>
+          @if (isProvider) {
+            <p-tab value="1">Company</p-tab>
+          }
+        </p-tablist>
+        <p-tabpanels>
+          <p-tabpanel value="0">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ p.email }}</span>
+              </div>
+              @if (p.phoneNumber) {
+                <div class="info-item">
+                  <span class="info-label">Phone</span>
+                  <span class="info-value">{{ p.phoneNumber }}</span>
+                </div>
+              }
+              @if (p.address) {
+                <div class="info-item">
+                  <span class="info-label">Address</span>
+                  <span class="info-value">{{ p.address }}</span>
+                </div>
+              }
+              @if (p.website) {
+                <div class="info-item">
+                  <span class="info-label">Website</span>
+                  <a [href]="p.website" target="_blank" rel="noopener noreferrer" class="info-link">{{ p.website }}</a>
+                </div>
+              }
+            </div>
+          </p-tabpanel>
+          @if (isProvider) {
+            <p-tabpanel value="1">
+              <div class="company-section">
+                @if (p.companyName) {
+                  <h3 class="company-name">{{ p.companyName }}</h3>
+                }
+                @if (p.companyDescription) {
+                  <p class="company-description">{{ p.companyDescription }}</p>
+                }
+                @if (!p.companyName && !p.companyDescription) {
+                  <p class="empty-state">No company information provided yet.</p>
+                }
+              </div>
+            </p-tabpanel>
+          }
+        </p-tabpanels>
+      </p-tabs>
+    }
+  }
+</div>

@@ -27,7 +27,8 @@ namespace backend.Services
             {
                 Token = token,
                 Email = user.Email,
-                Username = user.Username
+                Username = user.Username,
+                Role = user.Role.ToString()
             };
 
             return ResultResponse<AuthResponse>.Ok(authResponse);
@@ -41,13 +42,17 @@ namespace backend.Services
             if (await _userRepository.UsernameExistsAsync(request.Username))
                 return ResultResponse<AuthResponse>.Fail("Username is already taken.");
 
+            UserRole role = request.Role == "Provider" ? UserRole.Provider : UserRole.User;
+
             User user = new()
             {
                 Email = request.Email,
                 Username = request.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
                 FirstName = request.FirstName,
-                LastName = request.LastName
+                LastName = request.LastName,
+                Role = role,
+                ProfileImagePath = ProfileService.DefaultImagePath
             };
 
             await _userRepository.CreateAsync(user);
@@ -58,7 +63,8 @@ namespace backend.Services
             {
                 Token = token,
                 Email = user.Email,
-                Username = user.Username
+                Username = user.Username,
+                Role = user.Role.ToString()
             };
 
             return ResultResponse<AuthResponse>.Ok(authResponse);

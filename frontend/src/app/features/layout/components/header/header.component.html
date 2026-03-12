@@ -4,7 +4,7 @@
     <nav class="nav">
       <a routerLink="/home" routerLinkActive="active" class="nav-link">Home</a>
       @if (isLoggedIn()) {
-        <span class="welcome-text">{{ username() }}</span>
+        <a [routerLink]="['/profile', userId()]" routerLinkActive="active" class="nav-link">{{ username() }}</a>
         <p-button label="Logout" [text]="true" severity="secondary" (onClick)="onLogout()" />
       } @else {
         <a routerLink="/login" routerLinkActive="active" class="nav-link">Login</a>

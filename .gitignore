@@ -28,12 +28,7 @@ frontend/yarn-error.log
 *.launch
 .settings/
 *.sublime-workspace
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/mcp.json
+.vscode/
 .history/*
 
 # ========================
@@ -41,6 +36,13 @@ frontend/yarn-error.log
 # ========================
 .DS_Store
 Thumbs.db
+
+# ========================
+# Uploads
+# ========================
+backend/wwwroot/images/**
+!backend/wwwroot/images/profiles/
+!backend/wwwroot/images/profiles/default.png
 
 # ========================
 # Miscellaneous

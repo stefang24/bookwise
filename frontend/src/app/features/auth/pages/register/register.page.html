@@ -1,5 +1,9 @@
 <div class="auth-wrapper">
   <div class="auth-card">
+    <a routerLink="/home" class="back-home">
+      <i class="pi pi-arrow-left"></i> Back to home
+    </a>
+
     <div class="auth-header">
       <h1 class="auth-title">Create account</h1>
       <p class="auth-subtitle">Join BookWise today</p>
@@ -10,6 +14,16 @@
     }
 
     <form (ngSubmit)="onRegister()" class="auth-form">
+      <div class="form-field">
+        <label class="form-label">I want to register as</label>
+        <p-selectbutton
+          [options]="roleOptions"
+          [ngModel]="role()"
+          (ngModelChange)="role.set($event)"
+          name="role"
+          optionLabel="label"
+          optionValue="value" />
+      </div>
       <div class="form-row">
         <div class="form-field">
           <label for="firstName" class="form-label">First Name</label>
@@ -49,6 +63,9 @@
           name="username"
           placeholder="Choose a username"
           class="w-full" />
+        @if (usernameError()) {
+          <small class="field-error">{{ usernameError() }}</small>
+        }
       </div>
 
       <div class="form-field">
@@ -62,6 +79,9 @@
           name="email"
           placeholder="Enter your email"
           class="w-full" />
+        @if (emailError()) {
+          <small class="field-error">{{ emailError() }}</small>
+        }
       </div>
 
       <div class="form-field">
@@ -75,6 +95,26 @@
           [toggleMask]="true"
           styleClass="w-full"
           inputStyleClass="w-full" />
+        @if (passwordError()) {
+          <small class="field-error">{{ passwordError() }}</small>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <p-password
+          id="confirmPassword"
+          [ngModel]="confirmPassword()"
+          (ngModelChange)="confirmPassword.set($event)"
+          name="confirmPassword"
+          placeholder="Confirm your password"
+          [feedback]="false"
+          [toggleMask]="true"
+          styleClass="w-full"
+          inputStyleClass="w-full" />
+        @if (confirmPasswordError()) {
+          <small class="field-error">{{ confirmPasswordError() }}</small>
+        }
       </div>
 
       <p-button
@@ -82,7 +122,7 @@
         label="Create Account"
         styleClass="w-full"
         [loading]="isLoading"
-        [disabled]="isLoading || !email() || !username() || !password() || !firstName() || !lastName()" />
+        [disabled]="isLoading || !email() || !username() || !password() || !confirmPassword() || !firstName() || !lastName() || hasValidationErrors()" />
     </form>
 
     <p class="auth-footer">

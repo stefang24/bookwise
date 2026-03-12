@@ -7,6 +7,32 @@
   padding: 1rem;
 }
 
+.back-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s;
+}
+
+.back-home i {
+  font-size: 0.8rem;
+}
+
+.back-home:hover {
+  color: #1a1a2e;
+}
+
+.field-error {
+  color: #e24c4c;
+  font-size: 0.75rem;
+  margin-top: 0.125rem;
+}
+
 .auth-card {
   background: #ffffff;
   border-radius: 12px;
