@@ -11,6 +11,7 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { NotificationService } from '../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-register',
@@ -22,6 +23,7 @@ export class RegisterPage {
   private authService: AuthService = inject(AuthService);
   private router: Router = inject(Router);
   private loaderService: LoaderService = inject(LoaderService);
+  private notificationService: NotificationService = inject(NotificationService);
 
   email = signal<string>('');
   username = signal<string>('');
@@ -29,6 +31,8 @@ export class RegisterPage {
   confirmPassword = signal<string>('');
   firstName = signal<string>('');
   lastName = signal<string>('');
+  companyName = signal<string>('');
+  city = signal<string>('');
   role = signal<string>('User');
   errorMessage = signal<string>('');
 
@@ -63,6 +67,14 @@ export class RegisterPage {
     return !!this.emailError() || !!this.usernameError() || !!this.passwordError() || !!this.confirmPasswordError();
   });
 
+  companyNameError = computed<string>(() => {
+    if (this.role() !== 'Provider') return '';
+    const val: string = this.companyName().trim();
+    if (!val) return 'Company name is required for providers';
+    if (val.length < 2) return 'Company name must be at least 2 characters';
+    return '';
+  });
+
   roleOptions = [
     { label: 'User', value: 'User' },
     { label: 'Provider', value: 'Provider' }
@@ -80,8 +92,10 @@ export class RegisterPage {
       email: this.email(),
       username: this.username(),
       password: this.password(),
-      firstName: this.firstName(),
-      lastName: this.lastName(),
+      firstName: this.role() === 'Provider' ? this.companyName() : this.firstName(),
+      lastName: this.role() === 'Provider' ? '' : this.lastName(),
+      companyName: this.role() === 'Provider' ? this.companyName() : undefined,
+      city: this.role() === 'Provider' ? this.city().trim() || undefined : undefined,
       role: this.role()
     };
 
@@ -90,14 +104,17 @@ export class RegisterPage {
         this.loaderService.hide('register');
         if (response.success) {
           this.authService.setSession(response.data);
+          this.notificationService.success('Account created', 'Welcome to BookWise.');
           this.router.navigate(['/home']);
         } else {
           this.errorMessage.set(response.message);
+          this.notificationService.error('Registration failed', response.message || 'Please check your data.');
         }
       },
       error: () => {
         this.loaderService.hide('register');
         this.errorMessage.set('Registration failed. Please try again.');
+        this.notificationService.error('Registration failed', 'Please try again.');
       }
     });
   }

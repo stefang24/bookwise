@@ -43,15 +43,30 @@ namespace backend.Services
                 return ResultResponse<AuthResponse>.Fail("Username is already taken.");
 
             UserRole role = request.Role == "Provider" ? UserRole.Provider : UserRole.User;
+            string firstName = request.FirstName;
+            string lastName = request.LastName;
+            string? companyName = null;
+
+            if (role == UserRole.Provider)
+            {
+                if (string.IsNullOrWhiteSpace(request.CompanyName))
+                    return ResultResponse<AuthResponse>.Fail("Company name is required for providers.");
+
+                companyName = request.CompanyName.Trim();
+                firstName = companyName;
+                lastName = string.Empty;
+            }
 
             User user = new()
             {
                 Email = request.Email,
                 Username = request.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                FirstName = request.FirstName,
-                LastName = request.LastName,
+                FirstName = firstName,
+                LastName = lastName,
                 Role = role,
+                CompanyName = companyName,
+                City = role == UserRole.Provider ? request.City?.Trim() : null,
                 ProfileImagePath = ProfileService.DefaultImagePath
             };
 

@@ -1,0 +1,101 @@
+<div class="page-wrapper">
+  <p-confirmdialog />
+
+  <h1>Appointments</h1>
+
+  @if (errorMessage()) {
+    <p-message severity="error" [text]="errorMessage()" styleClass="w-full" />
+  }
+  <div class="filters">
+    <input pInputText [ngModel]="search()" (ngModelChange)="search.set($event)" placeholder="Search by service or person" />
+    <select class="select-input" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+      <option value="all">All statuses</option>
+      <option value="scheduled">Scheduled</option>
+      <option value="cancelled">Cancelled</option>
+      <option value="completed">Completed</option>
+    </select>
+    <select class="select-input" [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
+      <option value="date-desc">Date newest</option>
+      <option value="date-asc">Date oldest</option>
+      <option value="price-desc">Price highest</option>
+      <option value="price-asc">Price lowest</option>
+    </select>
+  </div>
+
+  <div class="calendar-card">
+    <div class="calendar-toolbar">
+      <div class="calendar-title">Calendar</div>
+      <div class="calendar-actions">
+        <input type="month" class="select-input month-input" [ngModel]="calendarMonth()" (ngModelChange)="calendarMonth.set($event)" />
+        @if (selectedCalendarDate()) {
+          <p-button label="Clear day" size="small" [text]="true" (onClick)="clearCalendarDateFilter()" />
+        }
+      </div>
+    </div>
+    <div class="calendar-weekdays">
+      <span>Mon</span>
+      <span>Tue</span>
+      <span>Wed</span>
+      <span>Thu</span>
+      <span>Fri</span>
+      <span>Sat</span>
+      <span>Sun</span>
+    </div>
+    <div class="calendar-grid">
+      @for (day of calendarDays(); track day.key) {
+        @if (day.day === 0) {
+          <div class="calendar-cell empty"></div>
+        } @else {
+          <button
+            type="button"
+            class="calendar-cell"
+            [class.busy]="day.busy"
+            [class.today]="day.today"
+            [class.selected]="selectedCalendarDate() === day.key"
+            (click)="selectCalendarDate(day.key)">
+            <span>{{ day.day }}</span>
+            @if (day.count > 0) {
+              <small>{{ day.count }} booked</small>
+            }
+          </button>
+        }
+      }
+    </div>
+  </div>
+
+  <div class="list">
+    @for (item of filteredItems(); track item.id) {
+      <div class="item">
+        <div class="item-main">
+          @if (isProvider ? getUserImageUrl(item.clientImagePath) : getUserImageUrl(item.providerImagePath)) {
+            <img
+              [src]="isProvider ? getUserImageUrl(item.clientImagePath) : getUserImageUrl(item.providerImagePath)"
+              alt="Person"
+              class="person-avatar" />
+          }
+          <div>
+          <div class="title">{{ item.serviceName }} ({{ item.status }})</div>
+          <div class="meta">
+            Provider:
+            <a [routerLink]="['/profile', item.providerId]" class="profile-link">{{ item.providerName }}</a>
+          </div>
+          <div class="meta">
+            Client:
+            <a [routerLink]="['/profile', item.clientId]" class="profile-link">{{ item.clientName }}</a>
+          </div>
+          <div class="meta">{{ item.startUtc | date:'dd/MM/yyyy HH:mm' }} - {{ item.endUtc | date:'HH:mm' }}</div>
+          <div class="meta">{{ item.priceEur | currency:'EUR':'symbol':'1.0-2' }}</div>
+          </div>
+        </div>
+
+        @if (item.status === 'Scheduled') {
+          <p-button label="Cancel" severity="danger" [outlined]="true" (onClick)="cancel(item)" />
+        }
+      </div>
+    }
+
+    @if (!filteredItems().length) {
+      <p class="empty">No appointments yet.</p>
+    }
+  </div>
+</div>

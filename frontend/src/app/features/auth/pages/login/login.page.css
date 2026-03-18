@@ -5,9 +5,13 @@
   justify-content: center;
   background: #f8fafc;
   padding: 1rem;
+  position: relative;
 }
 
 .back-home {
+  position: fixed;
+  top: 1.25rem;
+  left: 1.25rem;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -15,11 +19,12 @@
   font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
-  margin-bottom: 1.5rem;
+  z-index: 20;
+  cursor: pointer;
   transition: color 0.2s;
 }
 
-.back-home i {
+.back-arrow {
   font-size: 0.8rem;
 }
 
@@ -88,15 +93,25 @@
   color: #1a1a2e;
   font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .auth-link:hover {
   text-decoration: underline;
 }
 
+:host ::ng-deep .auth-form .p-button {
+  cursor: pointer;
+}
+
 @media (max-width: 480px) {
   .auth-card {
     padding: 1.5rem;
+  }
+
+  .back-home {
+    top: 1rem;
+    left: 1rem;
   }
 
   .auth-title {

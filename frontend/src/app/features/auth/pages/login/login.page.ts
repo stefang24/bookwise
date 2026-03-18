@@ -10,6 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
+import { NotificationService } from '../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +22,7 @@ export class LoginPage {
   private authService: AuthService = inject(AuthService);
   private router: Router = inject(Router);
   private loaderService: LoaderService = inject(LoaderService);
+  private notificationService: NotificationService = inject(NotificationService);
 
   email = signal<string>('');
   password = signal<string>('');
@@ -44,14 +46,17 @@ export class LoginPage {
         this.loaderService.hide('login');
         if (response.success) {
           this.authService.setSession(response.data);
+          this.notificationService.success('Login', 'Successfully logged in.');
           this.router.navigate(['/home']);
         } else {
           this.errorMessage.set(response.message);
+          this.notificationService.error('Login failed', response.message || 'Invalid credentials.');
         }
       },
       error: () => {
         this.loaderService.hide('login');
         this.errorMessage.set('Login failed. Please try again.');
+        this.notificationService.error('Login failed', 'Please try again.');
       }
     });
   }

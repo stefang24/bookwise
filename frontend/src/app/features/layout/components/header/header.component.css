@@ -22,6 +22,7 @@
   color: #1a1a2e;
   text-decoration: none;
   letter-spacing: -0.5px;
+  transition: color 0.2s ease;
 }
 
 .nav {
@@ -35,12 +36,13 @@
   color: #64748b;
   font-weight: 500;
   font-size: 0.938rem;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
   padding: 0.25rem 0;
 }
 
 .nav-link:hover {
   color: #1a1a2e;
+  transform: translateY(-1px);
 }
 
 .nav-link.active {

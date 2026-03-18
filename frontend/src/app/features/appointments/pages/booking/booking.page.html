@@ -1,0 +1,142 @@
+<div class="page-wrapper">
+  <p-confirmdialog />
+
+  <h1>Book an Appointment</h1>
+
+  @if (!isClient) {
+    <p-message severity="warn" text="Booking is available for user accounts." />
+  } @else {
+    @if (errorMessage()) {
+      <p-message severity="error" [text]="errorMessage()" styleClass="w-full" />
+    }
+
+    <div class="card search-card">
+      <div class="grid">
+        <div class="form-field">
+          <label>Category</label>
+          <select class="select-input" [ngModel]="category()" (ngModelChange)="category.set($event)">
+            <option value="">All categories</option>
+            @for (option of categoryOptions(); track option) {
+              <option [value]="option">{{ option }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Search</label>
+          <input pInputText [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Provider or service" />
+        </div>
+        <div class="form-field">
+          <label>Sort by</label>
+          <select class="select-input" [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
+            <option value="relevance">Relevance</option>
+            <option value="price-asc">Price: low to high</option>
+            <option value="price-desc">Price: high to low</option>
+            <option value="duration-asc">Duration: shortest first</option>
+            <option value="name">Name (A-Z)</option>
+          </select>
+        </div>
+        <div class="actions">
+          <p-button label="Search" [loading]="loading()" (onClick)="search()" />
+        </div>
+      </div>
+    </div>
+
+    <div class="list">
+      @for (item of filteredServices(); track item.id) {
+        <button class="service-item" type="button" (click)="chooseService(item)">
+          <div class="service-main">
+            <div class="image-stack">
+              @if (getServiceImageUrl(item)) {
+                <img [src]="getServiceImageUrl(item)" alt="Service" class="service-image" />
+              }
+              @if (getProviderImageUrl(item)) {
+                <img [src]="getProviderImageUrl(item)" alt="Provider" class="provider-avatar overlapped" />
+              }
+            </div>
+            <div>
+              <div class="title">{{ item.name }}</div>
+              <div class="meta">{{ item.category }}</div>
+              <div class="meta">
+                Provider:
+                <a [routerLink]="['/profile', item.providerId]" class="provider-link" (click)="$event.stopPropagation()">{{ item.providerName }}</a>
+              </div>
+              @if (item.providerCity) {
+                <div class="meta">City: {{ item.providerCity }}</div>
+              }
+              @if (item.description) {
+                <p class="description">{{ item.description }}</p>
+              }
+            </div>
+          </div>
+          <div class="meta right">{{ item.priceEur | currency:'EUR':'symbol':'1.0-2' }} | {{ item.durationMinutes }} min</div>
+        </button>
+      }
+      @if (!filteredServices().length) {
+        <p class="empty">Search services to start booking.</p>
+      }
+    </div>
+
+    <p-dialog
+      header="Service details"
+      [modal]="true"
+      [appendTo]="'body'"
+      [draggable]="false"
+      [resizable]="false"
+      [style]="{ width: '760px', maxWidth: '96vw' }"
+      [visible]="detailsDialogVisible()"
+      (visibleChange)="detailsDialogVisible.set($event)"
+      (onHide)="closeDetailsDialog()">
+      @if (selectedService(); as service) {
+        <div class="details-dialog">
+          <div class="details-top">
+            @if (getServiceImageUrl(service)) {
+              <img [src]="getServiceImageUrl(service)" alt="Service image" class="details-image" />
+            }
+            <div class="details-text">
+              <h2>{{ service.name }}</h2>
+              <div class="meta">{{ service.category }} | {{ service.priceEur | currency:'EUR':'symbol':'1.0-2' }} | {{ service.durationMinutes }} min</div>
+              <div class="meta provider-row">
+                @if (getProviderImageUrl(service)) {
+                  <img [src]="getProviderImageUrl(service)" alt="Provider" class="provider-avatar tiny" />
+                }
+                <span>
+                  Provider:
+                  <a class="provider-link" [routerLink]="['/profile', service.providerId]" (click)="closeDetailsDialog()">{{ service.providerName }}</a>
+                  @if (service.providerCity) { ({{ service.providerCity }}) }
+                </span>
+              </div>
+              @if (service.description) {
+                <p class="description">{{ service.description }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="slot-controls">
+            <input
+              type="date"
+              pInputText
+              [ngModel]="selectedDate()"
+              (ngModelChange)="selectedDate.set($event); loadCalendarSlots()" />
+          </div>
+
+          <div class="slots calendar-slots">
+            @for (slot of calendarSlots(); track slot.startUtc) {
+              <button
+                type="button"
+                class="slot-item"
+                [class.slot-unavailable]="!slot.isAvailable"
+                [disabled]="!slot.isAvailable"
+                (click)="bookCalendarSlot(slot)">
+                <span>{{ slot.startUtc | date:'dd/MM/yyyy HH:mm' }} - {{ slot.endUtc | date:'HH:mm' }}</span>
+                <strong>{{ slot.isAvailable ? 'Free - Book now' : 'Unavailable' }}</strong>
+              </button>
+            }
+            @if (!calendarSlots().length) {
+              <p class="empty">No slots for selected date.</p>
+            }
+          </div>
+        </div>
+      }
+    </p-dialog>
+  }
+</div>

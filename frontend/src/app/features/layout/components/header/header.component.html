@@ -4,6 +4,14 @@
     <nav class="nav">
       <a routerLink="/home" routerLinkActive="active" class="nav-link">Home</a>
       @if (isLoggedIn()) {
+        @if (role() === 'Provider') {
+          <a routerLink="/provider/services" routerLinkActive="active" class="nav-link">My Services</a>
+          <a routerLink="/provider/schedule" routerLinkActive="active" class="nav-link">Working Hours</a>
+        } @else {
+          <a routerLink="/book" routerLinkActive="active" class="nav-link">Book</a>
+          <a routerLink="/providers" routerLinkActive="active" class="nav-link">Providers</a>
+        }
+        <a routerLink="/appointments" routerLinkActive="active" class="nav-link">Appointments</a>
         <a [routerLink]="['/profile', userId()]" routerLinkActive="active" class="nav-link">{{ username() }}</a>
         <p-button label="Logout" [text]="true" severity="secondary" (onClick)="onLogout()" />
       } @else {

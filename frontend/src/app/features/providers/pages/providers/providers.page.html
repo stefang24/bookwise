@@ -1,0 +1,54 @@
+<div class="page-wrapper">
+  <h1>{{ heading() }}</h1>
+
+  @if (errorMessage()) {
+    <p-message severity="error" [text]="errorMessage()" styleClass="w-full" />
+  }
+
+  <div class="filters card">
+    <input pInputText [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Search providers" />
+    <select class="select-input" [ngModel]="category()" (ngModelChange)="category.set($event)">
+      <option value="">All categories</option>
+      @for (option of categories(); track option) {
+        <option [value]="option">{{ option }}</option>
+      }
+    </select>
+    <select class="select-input" [ngModel]="city()" (ngModelChange)="city.set($event)">
+      <option value="">All cities</option>
+      @for (option of cityOptions(); track option) {
+        <option [value]="option">{{ option }}</option>
+      }
+    </select>
+    <select class="select-input" [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
+      <option value="name">Name (A-Z)</option>
+      <option value="city">City</option>
+      <option value="services-desc">Most services</option>
+    </select>
+    <p-button label="Apply" [loading]="loading()" (onClick)="search()" />
+  </div>
+
+  <div class="list">
+    @for (item of items(); track item.id) {
+      <a class="provider-card" [routerLink]="['/profile', item.id]">
+        <div class="provider-main">
+          @if (getImage(item.profileImagePath)) {
+            <img [src]="getImage(item.profileImagePath)" alt="Provider" class="avatar" />
+          }
+          <div>
+            <div class="name">{{ item.name }}</div>
+            <div class="meta">{{ item.primaryCategory || 'No category' }}</div>
+            <div class="meta">{{ item.city || 'Unknown city' }}</div>
+            @if (item.address) {
+              <div class="meta">{{ item.address }}</div>
+            }
+          </div>
+        </div>
+        <div class="services-pill">{{ item.servicesCount }} services</div>
+      </a>
+    }
+
+    @if (!items().length && !loading()) {
+      <p class="empty">No providers found for selected filters.</p>
+    }
+  </div>
+</div>

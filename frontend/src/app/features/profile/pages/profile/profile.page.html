@@ -1,4 +1,6 @@
 <div class="profile-wrapper">
+  <p-confirmdialog />
+
   @if (isLoading) {
     <div class="loading-container">
       <i class="pi pi-spinner pi-spin" style="font-size: 2rem"></i>
@@ -32,14 +34,14 @@
         </div>
         <div class="profile-info">
           <div class="profile-name-row">
-            <h1 class="profile-name">{{ p.firstName }} {{ p.lastName }}</h1>
+            <h1 class="profile-name">{{ p.role === 'Provider' ? (p.companyName || p.firstName) : (p.firstName + ' ' + p.lastName) }}</h1>
             <p-tag [value]="p.role" [severity]="p.role === 'Provider' ? 'info' : p.role === 'Admin' ? 'danger' : 'secondary'" />
           </div>
           <p class="profile-username">@{{ p.username }}</p>
           @if (p.bio) {
             <p class="profile-bio">{{ p.bio }}</p>
           }
-          <p class="profile-joined">Joined {{ p.createdAt | date:'MMMM yyyy' }}</p>
+          <p class="profile-joined">Joined {{ p.createdAt | date:'dd/MM/yyyy' }}</p>
         </div>
       </div>
       <div class="profile-actions">
@@ -52,26 +54,21 @@
       </div>
     </div>
 
-    @if (successMessage()) {
-      <p-message severity="success" [text]="successMessage()" styleClass="w-full message-spacing" />
-    }
-    @if (errorMessage()) {
-      <p-message severity="error" [text]="errorMessage()" styleClass="w-full message-spacing" />
-    }
-
     @if (isEditing()) {
       <div class="edit-form">
         <h2 class="section-title">Edit Profile</h2>
-        <div class="form-row">
-          <div class="form-field">
-            <label class="form-label">First Name</label>
-            <input pInputText [ngModel]="editForm().firstName" (ngModelChange)="updateField('firstName', $event)" class="w-full" />
+        @if (!isProvider) {
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">First Name</label>
+              <input pInputText [ngModel]="editForm().firstName" (ngModelChange)="updateField('firstName', $event)" class="w-full" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">Last Name</label>
+              <input pInputText [ngModel]="editForm().lastName" (ngModelChange)="updateField('lastName', $event)" class="w-full" />
+            </div>
           </div>
-          <div class="form-field">
-            <label class="form-label">Last Name</label>
-            <input pInputText [ngModel]="editForm().lastName" (ngModelChange)="updateField('lastName', $event)" class="w-full" />
-          </div>
-        </div>
+        }
         <div class="form-field">
           <label class="form-label">Bio</label>
           <textarea pTextarea [ngModel]="editForm().bio ?? ''" (ngModelChange)="updateField('bio', $event)" rows="3" class="w-full"></textarea>
@@ -87,10 +84,25 @@
             <input pInputText [ngModel]="editForm().companyName ?? ''" (ngModelChange)="updateField('companyName', $event)" class="w-full" />
           </div>
           <div class="form-field">
+            <label class="form-label">Primary Category</label>
+            <p-autocomplete
+              [ngModel]="editForm().primaryCategory ?? ''"
+              (ngModelChange)="updateField('primaryCategory', $event)"
+              [suggestions]="filteredCategories()"
+              (completeMethod)="filterPrimaryCategorySuggestions($event)"
+              [dropdown]="true"
+              [forceSelection]="false"
+              styleClass="w-full" />
+          </div>
+          <div class="form-field">
             <label class="form-label">Company Description</label>
             <textarea pTextarea [ngModel]="editForm().companyDescription ?? ''" (ngModelChange)="updateField('companyDescription', $event)" rows="4" class="w-full"></textarea>
           </div>
           <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">City</label>
+              <input pInputText [ngModel]="editForm().city ?? ''" (ngModelChange)="updateField('city', $event)" class="w-full" />
+            </div>
             <div class="form-field">
               <label class="form-label">Address</label>
               <input pInputText [ngModel]="editForm().address ?? ''" (ngModelChange)="updateField('address', $event)" class="w-full" />
@@ -150,31 +162,58 @@
           <p-tab value="0">Info</p-tab>
           @if (isProvider) {
             <p-tab value="1">Company</p-tab>
+            <p-tab value="2">Services</p-tab>
           }
         </p-tablist>
         <p-tabpanels>
           <p-tabpanel value="0">
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="info-label">Email</span>
-                <span class="info-value">{{ p.email }}</span>
+            <div class="info-layout">
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Email</span>
+                  <span class="info-value">{{ p.email }}</span>
+                </div>
+                @if (p.phoneNumber) {
+                  <div class="info-item">
+                    <span class="info-label">Phone</span>
+                    <span class="info-value">{{ p.phoneNumber }}</span>
+                  </div>
+                }
+                @if (p.address) {
+                  <div class="info-item">
+                    <span class="info-label">Address</span>
+                    <span class="info-value">{{ p.address }}</span>
+                  </div>
+                }
+                @if (p.city) {
+                  <div class="info-item">
+                    <span class="info-label">City</span>
+                    <span class="info-value">{{ p.city }}</span>
+                  </div>
+                }
+                @if (p.website) {
+                  <div class="info-item">
+                    <span class="info-label">Website</span>
+                    <a [href]="getWebsiteHref(p.website)" target="_blank" rel="noopener noreferrer" class="info-link">{{ p.website }}</a>
+                  </div>
+                }
               </div>
-              @if (p.phoneNumber) {
-                <div class="info-item">
-                  <span class="info-label">Phone</span>
-                  <span class="info-value">{{ p.phoneNumber }}</span>
-                </div>
-              }
-              @if (p.address) {
-                <div class="info-item">
-                  <span class="info-label">Address</span>
-                  <span class="info-value">{{ p.address }}</span>
-                </div>
-              }
-              @if (p.website) {
-                <div class="info-item">
-                  <span class="info-label">Website</span>
-                  <a [href]="p.website" target="_blank" rel="noopener noreferrer" class="info-link">{{ p.website }}</a>
+
+              @if (isProvider) {
+                <div class="hours-panel">
+                  <h4 class="hours-title">Working Hours</h4>
+                  @if (workingHours().length) {
+                    <div class="working-hours-list">
+                      @for (row of getOrderedWorkingHours(); track row.dayOfWeek) {
+                        <div class="working-hour-row">
+                          <span class="working-day">{{ dayNames[row.dayOfWeek] }}</span>
+                          <span class="working-time">{{ row.isWorking ? ((row.startTime || '--:--') + ' - ' + (row.endTime || '--:--')) : 'Off' }}</span>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <p class="empty-state">Working hours are not set yet.</p>
+                  }
                 </div>
               }
             </div>
@@ -185,11 +224,68 @@
                 @if (p.companyName) {
                   <h3 class="company-name">{{ p.companyName }}</h3>
                 }
+                @if (p.primaryCategory) {
+                  <p class="company-category">Primary category: {{ p.primaryCategory }}</p>
+                }
                 @if (p.companyDescription) {
                   <p class="company-description">{{ p.companyDescription }}</p>
                 }
+
                 @if (!p.companyName && !p.companyDescription) {
                   <p class="empty-state">No company information provided yet.</p>
+                }
+              </div>
+            </p-tabpanel>
+
+            <p-tabpanel value="2">
+              @if (canManageServicesFromProfile) {
+                <div class="service-actions" style="margin-bottom: 1rem;">
+                  <p-button
+                    label="Add Service"
+                    icon="pi pi-plus"
+                    [routerLink]="['/provider/services']" />
+                </div>
+              }
+
+              <div class="services-list">
+                @for (service of providerServices(); track service.id) {
+                  <div class="service-row">
+                    <div class="service-main">
+                      @if (getServiceImageUrl(service.imageUrl)) {
+                        <img [src]="getServiceImageUrl(service.imageUrl)" alt="Service" class="service-thumb" />
+                      }
+                      <div>
+                        <div class="service-title">{{ service.name }}</div>
+                        <div class="service-meta">{{ service.category }} | {{ service.priceEur }} EUR | {{ service.durationMinutes }} min</div>
+                        @if (service.description) {
+                          <p class="service-description">{{ service.description }}</p>
+                        }
+                      </div>
+                    </div>
+
+                    @if (canBookFromProfile) {
+                      <p-button label="Book" [outlined]="true" [routerLink]="['/book']" [queryParams]="{ serviceId: service.id }" />
+                    }
+
+                    @if (canManageServicesFromProfile) {
+                      <div class="service-actions">
+                        <p-button
+                          label="Edit"
+                          [outlined]="true"
+                          [routerLink]="['/provider/services']"
+                          [queryParams]="{ editId: service.id }" />
+                        <p-button
+                          label="Delete"
+                          severity="danger"
+                          [outlined]="true"
+                          (onClick)="removeOwnService(service.id)" />
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (!providerServices().length) {
+                  <p class="empty-state">No active services.</p>
                 }
               </div>
             </p-tabpanel>

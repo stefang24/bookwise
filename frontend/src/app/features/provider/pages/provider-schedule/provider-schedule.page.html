@@ -1,0 +1,49 @@
+<div class="page-wrapper">
+  <h1>Working Hours</h1>
+
+  @if (!isProvider) {
+    <p-message severity="warn" text="Only providers can edit working hours." />
+  } @else {
+    @if (loadCompleted() && !loading() && !hasSavedSchedule()) {
+      <p-message severity="info" text="Working hours are not set yet. Configure your schedule for all 7 days." styleClass="w-full" />
+    }
+    @if (errorMessage()) {
+      <p-message severity="error" [text]="errorMessage()" styleClass="w-full" />
+    }
+
+    <div class="card">
+      @for (row of getOrderedRows(); track row.dayOfWeek) {
+        <div class="row">
+          <div class="day">{{ dayNames[row.dayOfWeek] }}</div>
+          <div class="toggle">
+            <p-checkbox
+              [binary]="true"
+              [ngModel]="row.isWorking"
+              (ngModelChange)="updateWorking(row.dayOfWeek, $event)"
+              inputId="day-{{ row.dayOfWeek }}" />
+            <label for="day-{{ row.dayOfWeek }}">Working</label>
+          </div>
+          <div class="time-range">
+            <input
+              pInputText
+              type="time"
+              [disabled]="!row.isWorking"
+              [ngModel]="row.startTime ?? ''"
+              (ngModelChange)="updateTime(row.dayOfWeek, 'startTime', $event)" />
+            <span>to</span>
+            <input
+              pInputText
+              type="time"
+              [disabled]="!row.isWorking"
+              [ngModel]="row.endTime ?? ''"
+              (ngModelChange)="updateTime(row.dayOfWeek, 'endTime', $event)" />
+          </div>
+        </div>
+      }
+
+      <div class="actions">
+        <p-button label="Save Schedule" [loading]="loading()" (onClick)="save()" />
+      </div>
+    </div>
+  }
+</div>

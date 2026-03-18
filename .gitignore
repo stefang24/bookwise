@@ -43,6 +43,8 @@ Thumbs.db
 backend/wwwroot/images/**
 !backend/wwwroot/images/profiles/
 !backend/wwwroot/images/profiles/default.png
+!backend/wwwroot/images/services/
+!backend/wwwroot/images/services/default-service.svg
 
 # ========================
 # Miscellaneous

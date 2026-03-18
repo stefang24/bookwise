@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { LayoutPage } from './features/layout/pages/layout.page';
-import { guestGuard } from './shared/guards/auth.guard';
+import { authGuard, guestGuard, providerGuard, userGuard } from './shared/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -13,7 +13,33 @@ export const routes: Routes = [
       },
       {
         path: 'profile/:id',
+        canActivate: [authGuard],
         loadComponent: () => import('./features/profile/pages/profile/profile.page').then(m => m.ProfilePage)
+      },
+      {
+        path: 'provider/services',
+        canActivate: [providerGuard],
+        loadComponent: () => import('./features/provider/pages/provider-services/provider-services.page').then(m => m.ProviderServicesPage)
+      },
+      {
+        path: 'provider/schedule',
+        canActivate: [providerGuard],
+        loadComponent: () => import('./features/provider/pages/provider-schedule/provider-schedule.page').then(m => m.ProviderSchedulePage)
+      },
+      {
+        path: 'book',
+        canActivate: [userGuard],
+        loadComponent: () => import('./features/appointments/pages/booking/booking.page').then(m => m.BookingPage)
+      },
+      {
+        path: 'providers',
+        canActivate: [userGuard],
+        loadComponent: () => import('./features/providers/pages/providers/providers.page').then(m => m.ProvidersPage)
+      },
+      {
+        path: 'appointments',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/appointments/pages/history/history.page').then(m => m.HistoryPage)
       },
       {
         path: '',

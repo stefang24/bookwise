@@ -37,17 +37,28 @@ namespace backend.Services
             if (user == null)
                 return ResultResponse<ProfileResponse>.Fail("User not found.");
 
-            user.FirstName = request.FirstName;
-            user.LastName = request.LastName;
             user.Bio = request.Bio;
             user.PhoneNumber = request.PhoneNumber;
 
             if (user.Role == UserRole.Provider)
             {
                 user.CompanyName = request.CompanyName;
+                user.PrimaryCategory = request.PrimaryCategory;
                 user.CompanyDescription = request.CompanyDescription;
+                user.City = request.City;
                 user.Address = request.Address;
                 user.Website = request.Website;
+
+                if (!string.IsNullOrWhiteSpace(request.CompanyName))
+                {
+                    user.FirstName = request.CompanyName.Trim();
+                    user.LastName = string.Empty;
+                }
+            }
+            else
+            {
+                user.FirstName = request.FirstName;
+                user.LastName = request.LastName;
             }
 
             if (!string.IsNullOrEmpty(request.NewPassword))
@@ -130,7 +141,9 @@ namespace backend.Services
                 Bio = user.Bio,
                 PhoneNumber = user.PhoneNumber,
                 CompanyName = user.CompanyName,
+                PrimaryCategory = user.PrimaryCategory,
                 CompanyDescription = user.CompanyDescription,
+                City = user.City,
                 Address = user.Address,
                 Website = user.Website,
                 CreatedAt = user.CreatedAt

@@ -4,5 +4,7 @@ export interface RegisterRequest {
   password: string;
   firstName: string;
   lastName: string;
+  companyName?: string;
+  city?: string;
   role: string;
 }

@@ -1,0 +1,136 @@
+<div class="page-wrapper">
+  <p-confirmdialog />
+
+  <div class="header-row">
+    <h1>My Services</h1>
+    @if (isProvider && !isFormOpen()) {
+      <p-button label="Add Service" icon="pi pi-plus" styleClass="add-service-btn" (onClick)="openCreateForm()" />
+    }
+  </div>
+
+  @if (!isProvider) {
+    <p-message severity="warn" text="Only providers can manage services." />
+  } @else {
+    @if (errorMessage()) {
+      <p-message severity="error" [text]="errorMessage()" styleClass="w-full" />
+    }
+
+    @if (isFormOpen()) {
+      <div class="card">
+        <h2>{{ editingId() === null ? 'Add New Service' : 'Edit Service' }}</h2>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Service Name</label>
+            <input
+              pInputText
+              [ngModel]="form().name"
+              (ngModelChange)="form.update(v => ({ ...v, name: $event }))"
+              placeholder="Skin fade" />
+          </div>
+          <div class="form-field">
+            <label>Category</label>
+            <p-autocomplete
+              [ngModel]="form().category"
+              (ngModelChange)="form.update(v => ({ ...v, category: $event }))"
+              [suggestions]="filteredCategorySuggestions()"
+              (completeMethod)="filterCategorySuggestions($event)"
+              [dropdown]="true"
+              [forceSelection]="false"
+              placeholder="Haircut"
+              styleClass="w-full" />
+          </div>
+          <div class="form-field form-field-full">
+            <label>Description (optional)</label>
+            <input
+              pInputText
+              [ngModel]="form().description ?? ''"
+              (ngModelChange)="form.update(v => ({ ...v, description: $event }))"
+              placeholder="Classic skin fade with razor finish" />
+          </div>
+          <div class="form-field form-field-full">
+            <label>Service Image (optional)</label>
+            <div class="upload-row">
+              <label class="upload-button">
+                <input class="upload-input" type="file" accept="image/*" (change)="onImageSelected($event)" />
+                <span><i class="pi pi-upload"></i> Upload image</span>
+              </label>
+              @if (pendingImageFile()) {
+                <span class="upload-status"><i class="pi pi-image"></i> {{ pendingImageFile()!.name }}</span>
+              }
+            </div>
+            @if (pendingImagePreviewUrl()) {
+              <img [src]="pendingImagePreviewUrl()" alt="Preview" class="service-image preview" />
+            } @else if (getImagePreview(form().imageUrl)) {
+              <img [src]="getImagePreview(form().imageUrl)" alt="Preview" class="service-image preview" />
+            }
+          </div>
+          <div class="form-field">
+            <label>Price (EUR)</label>
+            <p-inputnumber
+              [ngModel]="form().priceEur"
+              (ngModelChange)="form.update(v => ({ ...v, priceEur: $event ?? 0 }))"
+              mode="currency"
+              currency="EUR"
+              locale="de-DE"
+              [min]="0"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="2" />
+          </div>
+          <div class="form-field">
+            <label>Duration (minutes)</label>
+            <p-inputnumber
+              [ngModel]="durationMinutesInput()"
+              (ngModelChange)="setDurationMinutes($event)"
+              [min]="5"
+              [max]="240" />
+          </div>
+        </div>
+        <div class="actions">
+          <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="closeCreateForm()" />
+          <p-button [label]="editingId() === null ? 'Add Service' : 'Save Changes'" [loading]="isUploading()" [disabled]="isUploading()" (onClick)="submit()" />
+        </div>
+      </div>
+    }
+
+    <div class="card filters">
+      <input pInputText [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Search services" />
+      <select class="select-input" [ngModel]="filterCategory()" (ngModelChange)="filterCategory.set($event)">
+        <option value="">All categories</option>
+        @for (category of categorySuggestions(); track category) {
+          <option [value]="category">{{ category }}</option>
+        }
+      </select>
+      <select class="select-input" [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
+        <option value="name">Name (A-Z)</option>
+        <option value="price-asc">Price low-high</option>
+        <option value="price-desc">Price high-low</option>
+        <option value="duration-asc">Duration shortest</option>
+        <option value="duration-desc">Duration longest</option>
+      </select>
+    </div>
+
+    <div class="list">
+      @for (item of filteredItems(); track item.id) {
+        <div class="service-item">
+          <div class="service-body">
+            @if (item.imageUrl) {
+              <img [src]="getImagePreview(item.imageUrl)" alt="Service" class="service-image" />
+            }
+            <div class="title">{{ item.name }}</div>
+            <div class="meta">{{ item.category }} | {{ item.priceEur | currency:'EUR':'symbol':'1.0-2' }} | {{ item.durationMinutes }} min</div>
+            @if (item.description) {
+              <p class="description">{{ item.description }}</p>
+            }
+          </div>
+          <div class="item-actions">
+            <p-button label="Edit" size="small" [outlined]="true" (onClick)="edit(item)" />
+            <p-button label="Delete" size="small" severity="danger" [outlined]="true" (onClick)="remove(item.id)" />
+          </div>
+        </div>
+      }
+      @if (!items().length && !isLoading()) {
+        <p class="empty">No services yet.</p>
+      }
+    </div>
+  }
+</div>

@@ -22,6 +22,9 @@ namespace backend.Extensions
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IProviderServiceRepository, ProviderServiceRepository>();
+            services.AddScoped<IWorkingHoursRepository, WorkingHoursRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
             return services;
         }
@@ -30,6 +33,9 @@ namespace backend.Extensions
         {
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IProfileService, ProfileService>();
+            services.AddScoped<IProviderCatalogService, ProviderCatalogService>();
+            services.AddScoped<IWorkingHoursService, WorkingHoursService>();
+            services.AddScoped<IAppointmentService, AppointmentService>();
 
             return services;
         }

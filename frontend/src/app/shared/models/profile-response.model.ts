@@ -9,7 +9,9 @@ export interface ProfileResponse {
   bio: string | null;
   phoneNumber: string | null;
   companyName: string | null;
+  primaryCategory: string | null;
   companyDescription: string | null;
+  city: string | null;
   address: string | null;
   website: string | null;
   createdAt: string;

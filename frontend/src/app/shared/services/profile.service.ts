@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ResultResponse } from '../models/result-response.model';
 import { ProfileResponse } from '../models/profile-response.model';
 import { UpdateProfileRequest } from '../models/update-profile-request.model';
+import { withApi } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ import { UpdateProfileRequest } from '../models/update-profile-request.model';
 export class ProfileService {
   private http: HttpClient = inject(HttpClient);
 
-  private readonly API_URL: string = 'http://localhost:5227/api/profile';
+  private readonly API_URL: string = withApi('/api/profile');
 
   getProfile(userId: number): Observable<ResultResponse<ProfileResponse>> {
     return this.http.get<ResultResponse<ProfileResponse>>(`${this.API_URL}/${userId}`);

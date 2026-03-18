@@ -8,6 +8,7 @@ import { LoginRequest } from '../models/login-request.model';
 import { RegisterRequest } from '../models/register-request.model';
 import { LocalStorageService } from './local-storage.service';
 import { jwtDecode } from 'jwt-decode';
+import { withApi } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class AuthService {
   private router: Router = inject(Router);
   private localStorageService: LocalStorageService = inject(LocalStorageService);
 
-  private readonly API_URL: string = 'http://localhost:5227/api/auth';
+  private readonly API_URL: string = withApi('/api/auth');
 
   private _isLoggedIn = signal<boolean>(!!this.localStorageService.getToken());
   private _username = signal<string>(this.localStorageService.getUsername());

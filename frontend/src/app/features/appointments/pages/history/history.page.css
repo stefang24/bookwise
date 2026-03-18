@@ -1,0 +1,172 @@
+.page-wrapper {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 180px 180px;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.calendar-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.calendar-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.calendar-title {
+  font-weight: 700;
+}
+
+.calendar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.month-input {
+  width: 170px;
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.calendar-weekdays span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #64748b;
+  text-align: center;
+}
+
+.calendar-cell {
+  min-height: 56px;
+  border: 1px solid #dbe4ee;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.calendar-cell small {
+  color: #475569;
+  font-size: 0.72rem;
+}
+
+.calendar-cell.busy {
+  background: #eef2ff;
+  border-color: #a5b4fc;
+}
+
+.calendar-cell.today {
+  border-color: #475569;
+}
+
+.calendar-cell.selected {
+  background: #dbeafe;
+  border-color: #3b82f6;
+}
+
+.calendar-cell.empty {
+  border: none;
+  background: transparent;
+}
+
+.select-input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  min-height: 40px;
+  padding: 0 0.6rem;
+  background: #fff;
+}
+
+.item {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.item-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.person-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #dbe4ee;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.meta {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.profile-link {
+  color: #0f172a;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.profile-link:hover {
+  text-decoration: underline;
+}
+
+.empty {
+  color: #64748b;
+}
+
+@media (max-width: 700px) {
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
