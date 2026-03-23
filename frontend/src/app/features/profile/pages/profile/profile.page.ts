@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal, OnInit } from '@angular/core';
-import { ActivatedRoute, Params, RouterLink } from '@angular/router';
+import { ActivatedRoute, Params, RouterLink, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../../../../shared/services/profile.service';
@@ -58,6 +58,7 @@ export class ProfilePage implements OnInit {
   private loaderService: LoaderService = inject(LoaderService);
   private notificationService: NotificationService = inject(NotificationService);
   private confirmationService: ConfirmationService = inject(ConfirmationService);
+  private router: Router = inject(Router);
 
   profile = signal<ProfileResponse | null>(null);
   isEditing = signal<boolean>(false);
@@ -112,6 +113,13 @@ export class ProfilePage implements OnInit {
 
   get showChatButton(): boolean {
     return this.isProvider && !this.isOwnProfile && this.authService.isLoggedIn();
+  }
+
+  onChatClick(): void {
+    const profileData: ProfileResponse | null = this.profile();
+    if (profileData) {
+      this.router.navigate(['/chat'], { queryParams: { with: profileData.id } });
+    }
   }
 
   get canBookFromProfile(): boolean {

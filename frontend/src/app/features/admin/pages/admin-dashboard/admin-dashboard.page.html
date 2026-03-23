@@ -1,0 +1,297 @@
+<div class="page-wrapper">
+  <h1>Admin Panel</h1>
+
+  @if (errorMessage()) {
+    <p-message severity="error" [text]="errorMessage()" styleClass="w-full" />
+  }
+
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Users</p-tab>
+      <p-tab value="1">Providers</p-tab>
+      <p-tab value="2">Appointments</p-tab>
+      <p-tab value="3">Statistics</p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <p-tabpanel value="0">
+        <div class="table-tools">
+          <input pInputText placeholder="Search users" [ngModel]="userSearch()" (ngModelChange)="userSearch.set($event)" />
+          <select class="table-select" [ngModel]="userStatusFilter()" (ngModelChange)="userStatusFilter.set($event)">
+            <option value="all">All status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <select class="table-select" [ngModel]="userSort()" (ngModelChange)="userSort.set($event)">
+            <option value="created-desc">Newest first</option>
+            <option value="created-asc">Oldest first</option>
+            <option value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+          </select>
+        </div>
+
+        @if (loadingUsers()) {
+          <p class="empty">Loading users...</p>
+        } @else {
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>City</th>
+                  <th>Created</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (user of filteredUsers(); track user.id) {
+                  <tr>
+                    <td>
+                      <button type="button" class="link-button" (click)="goToProfile(user.id)">{{ user.username }}</button>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>
+                      <span [class.active]="user.isActive" [class.inactive]="!user.isActive" class="status-pill">
+                        {{ user.isActive ? 'Active' : 'Inactive' }}
+                      </span>
+                    </td>
+                    <td>{{ user.city || '-' }}</td>
+                    <td>{{ user.createdAt | date:'dd/MM/yyyy' }}</td>
+                    <td>
+                      @if (user.role !== 'Admin') {
+                        <p-button
+                          label="View Profile"
+                          severity="secondary"
+                          size="small"
+                          [text]="true"
+                          (onClick)="goToProfile(user.id)" />
+                        <p-button
+                          [label]="user.isActive ? 'Deactivate' : 'Activate'"
+                          [severity]="user.isActive ? 'danger' : 'success'"
+                          size="small"
+                          [outlined]="true"
+                          (onClick)="toggleActivation(user)" />
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </p-tabpanel>
+
+      <p-tabpanel value="1">
+        <div class="table-tools">
+          <input pInputText placeholder="Search providers" [ngModel]="providerSearch()" (ngModelChange)="providerSearch.set($event)" />
+          <select class="table-select" [ngModel]="providerStatusFilter()" (ngModelChange)="providerStatusFilter.set($event)">
+            <option value="all">All status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <select class="table-select" [ngModel]="providerSort()" (ngModelChange)="providerSort.set($event)">
+            <option value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+            <option value="created-desc">Newest first</option>
+          </select>
+        </div>
+
+        @if (loadingUsers()) {
+          <p class="empty">Loading providers...</p>
+        } @else {
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>City</th>
+                  <th>Created</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (provider of filteredProviders(); track provider.id) {
+                  <tr>
+                    <td>
+                      <button type="button" class="link-button" (click)="goToProfile(provider.id)">{{ provider.name }}</button>
+                    </td>
+                    <td>{{ provider.username }}</td>
+                    <td>{{ provider.email }}</td>
+                    <td>
+                      <span [class.active]="provider.isActive" [class.inactive]="!provider.isActive" class="status-pill">
+                        {{ provider.isActive ? 'Active' : 'Inactive' }}
+                      </span>
+                    </td>
+                    <td>{{ provider.city || '-' }}</td>
+                    <td>{{ provider.createdAt | date:'dd/MM/yyyy' }}</td>
+                    <td>
+                      <p-button
+                        label="View Profile"
+                        severity="secondary"
+                        size="small"
+                        [text]="true"
+                        (onClick)="goToProfile(provider.id)" />
+                      <p-button
+                        [label]="provider.isActive ? 'Deactivate' : 'Activate'"
+                        [severity]="provider.isActive ? 'danger' : 'success'"
+                        size="small"
+                        [outlined]="true"
+                        (onClick)="toggleActivation(provider)" />
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </p-tabpanel>
+
+      <p-tabpanel value="2">
+        <div class="table-tools">
+          <input pInputText placeholder="Search appointments" [ngModel]="appointmentSearch()" (ngModelChange)="appointmentSearch.set($event)" />
+          <select class="table-select" [ngModel]="appointmentStatusFilter()" (ngModelChange)="appointmentStatusFilter.set($event)">
+            <option value="all">All status</option>
+            <option value="Scheduled">Scheduled</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <select class="table-select" [ngModel]="appointmentCategoryFilter()" (ngModelChange)="appointmentCategoryFilter.set($event)">
+            <option value="all">All categories</option>
+            @for (category of appointmentCategories(); track category) {
+              <option [value]="category">{{ category }}</option>
+            }
+          </select>
+          <select class="table-select" [ngModel]="appointmentSort()" (ngModelChange)="appointmentSort.set($event)">
+            <option value="start-desc">Start newest</option>
+            <option value="start-asc">Start oldest</option>
+            <option value="price-desc">Price high-low</option>
+            <option value="price-asc">Price low-high</option>
+          </select>
+        </div>
+
+        @if (loadingAppointments()) {
+          <p class="empty">Loading appointments...</p>
+        } @else {
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Service</th>
+                  <th>Category</th>
+                  <th>Provider</th>
+                  <th>Client</th>
+                  <th>Start</th>
+                  <th>Status</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of filteredAppointments(); track item.id) {
+                  <tr>
+                    <td>{{ item.serviceName }}</td>
+                    <td>{{ item.category }}</td>
+                    <td>
+                      <button type="button" class="link-button" (click)="goToProfile(item.providerId)">{{ item.providerName }}</button>
+                    </td>
+                    <td>
+                      <button type="button" class="link-button" (click)="goToProfile(item.clientId)">{{ item.clientName }}</button>
+                    </td>
+                    <td>{{ item.startUtc | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>{{ item.status }}</td>
+                    <td>{{ item.priceEur | currency:'EUR':'symbol':'1.0-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </p-tabpanel>
+
+      <p-tabpanel value="3">
+        <div class="stats-filter">
+          <input pInputText type="date" [ngModel]="fromDate()" (ngModelChange)="fromDate.set($event)" />
+          <input pInputText type="date" [ngModel]="toDate()" (ngModelChange)="toDate.set($event)" />
+          <p-button label="Apply range" (onClick)="loadStats()" [loading]="loadingStats()" />
+        </div>
+
+        @if (stats(); as s) {
+          <div class="stats-cards">
+            <div class="stats-card">
+              <div class="stats-label">Users</div>
+              <div class="stats-value">{{ s.totalUsers }}</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Providers</div>
+              <div class="stats-value">{{ s.totalProviders }}</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Appointments</div>
+              <div class="stats-value">{{ s.totalAppointments }}</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Scheduled</div>
+              <div class="stats-value">{{ s.scheduledAppointments }}</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Completed</div>
+              <div class="stats-value">{{ s.completedAppointments }}</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Cancelled</div>
+              <div class="stats-value">{{ s.cancelledAppointments }}</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Active Users</div>
+              <div class="stats-value">{{ activeUsersCount() }}</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Active Providers</div>
+              <div class="stats-value">{{ activeProvidersCount() }}</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Completion Rate</div>
+              <div class="stats-value">{{ completionRate() | number:'1.0-1' }}%</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Cancellation Rate</div>
+              <div class="stats-value">{{ cancellationRate() | number:'1.0-1' }}%</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Total Revenue</div>
+              <div class="stats-value">{{ totalRevenueEur() | currency:'EUR':'symbol':'1.0-2' }}</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Avg Appointment Value</div>
+              <div class="stats-value">{{ averagePriceEur() | currency:'EUR':'symbol':'1.0-2' }}</div>
+            </div>
+          </div>
+
+          <div class="stats-chart-wrap">
+            <div class="stats-block chart-block">
+              <h3>Bookings by date</h3>
+              <div class="chart-host">
+                <p-chart type="line" [data]="bookingsByDateChartData()" [options]="chartOptions" />
+              </div>
+              <p class="stats-note">{{ bookingsByDateText() }}</p>
+            </div>
+
+            <div class="stats-block chart-block">
+              <h3>Bookings by category</h3>
+              <div class="chart-host">
+                <p-chart type="doughnut" [data]="bookingsByCategoryChartData()" [options]="chartOptions" />
+              </div>
+              <p class="stats-note">{{ bookingsByCategoryText() }}</p>
+            </div>
+          </div>
+        }
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>

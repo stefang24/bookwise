@@ -5,7 +5,7 @@ namespace backend.Repositories
     public interface IAppointmentRepository
     {
         Task<List<Appointment>> GetPastScheduledAsync();
-        Task<List<Appointment>> GetScheduledByProviderForDateAsync(int providerId, DateTime date);
+        Task<List<Appointment>> GetScheduledByProviderForDateAsync(int providerId, DateOnly date);
         Task<bool> HasConflictAsync(int providerId, DateTime startUtc, DateTime endUtc);
         Task<Appointment?> GetByIdWithServiceAsync(int id);
         Task<List<Appointment>> GetHistoryAsync(int userId, bool isProvider);

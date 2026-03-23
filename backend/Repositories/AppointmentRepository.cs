@@ -21,11 +21,14 @@ namespace backend.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<Appointment>> GetScheduledByProviderForDateAsync(int providerId, DateTime date)
+        public async Task<List<Appointment>> GetScheduledByProviderForDateAsync(int providerId, DateOnly date)
         {
+            DateTime dayStartUtc = DateTime.SpecifyKind(date.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+            DateTime dayEndUtc = dayStartUtc.AddDays(1);
+
             return await _context.Appointments
                 .Where(x => x.ProviderService.ProviderId == providerId && x.Status == AppointmentStatus.Scheduled)
-                .Where(x => x.StartUtc.Date == date.Date)
+                .Where(x => x.StartUtc >= dayStartUtc && x.StartUtc < dayEndUtc)
                 .ToListAsync();
         }
 

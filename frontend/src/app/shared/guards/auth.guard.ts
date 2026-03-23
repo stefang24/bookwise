@@ -59,3 +59,56 @@ export const userGuard: CanActivateFn = () => {
 
   return true;
 };
+
+export const userOrProviderGuard: CanActivateFn = () => {
+  const localStorageService: LocalStorageService = inject(LocalStorageService);
+  const router: Router = inject(Router);
+
+  if (!localStorageService.getToken()) {
+    router.navigate(['/login']);
+    return false;
+  }
+
+  const role: string = localStorageService.getRole();
+  if (role !== 'User' && role !== 'Provider') {
+    router.navigate(['/home']);
+    return false;
+  }
+
+  return true;
+};
+
+export const adminGuard: CanActivateFn = () => {
+  const localStorageService: LocalStorageService = inject(LocalStorageService);
+  const router: Router = inject(Router);
+
+  if (!localStorageService.getToken()) {
+    router.navigate(['/login']);
+    return false;
+  }
+
+  if (localStorageService.getRole() !== 'Admin') {
+    router.navigate(['/home']);
+    return false;
+  }
+
+  return true;
+};
+
+export const chatGuard: CanActivateFn = () => {
+  const localStorageService: LocalStorageService = inject(LocalStorageService);
+  const router: Router = inject(Router);
+
+  if (!localStorageService.getToken()) {
+    router.navigate(['/login']);
+    return false;
+  }
+
+  const role: string = localStorageService.getRole();
+  if (role !== 'User' && role !== 'Provider') {
+    router.navigate(['/home']);
+    return false;
+  }
+
+  return true;
+};

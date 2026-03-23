@@ -1,0 +1,94 @@
+<div class="page-wrapper chat-page">
+  <h1>Chat</h1>
+
+  @if (errorMessage()) {
+    <p-message severity="error" [text]="errorMessage()" styleClass="w-full" />
+  }
+
+  <div class="chat-layout">
+    <aside class="contacts-card">
+      <div class="contacts-title">Conversations</div>
+
+      @if (loadingContacts()) {
+        <p class="empty">Loading...</p>
+      } @else {
+        <div class="contacts-list">
+          @for (contact of contacts(); track contact.userId) {
+            <button
+              type="button"
+              class="contact-item"
+              [class.active]="selectedContact()?.userId === contact.userId"
+              (click)="selectContact(contact)">
+              @if (contactAvatar(contact.profileImagePath)) {
+                <img [src]="contactAvatar(contact.profileImagePath)" alt="Avatar" class="avatar" />
+              }
+              <div class="contact-content">
+                <div class="contact-name-row">
+                  <div class="contact-name">{{ contact.name }}</div>
+                  @if (unreadCount(contact.userId) > 0) {
+                    <span class="unread-dot" [attr.aria-label]="'Unread messages: ' + unreadCount(contact.userId)">
+                      {{ unreadCount(contact.userId) > 9 ? '9+' : unreadCount(contact.userId) }}
+                    </span>
+                  }
+                </div>
+                <div class="contact-meta">{{ contact.role }}</div>
+                @if (contact.lastMessage) {
+                  <div class="contact-last">{{ contact.lastMessage }}</div>
+                }
+              </div>
+            </button>
+          }
+
+          @if (!contacts().length) {
+            <p class="empty">No conversations yet.</p>
+          }
+        </div>
+      }
+    </aside>
+
+    <section class="messages-card">
+      @if (selectedContact(); as contact) {
+        <div class="messages-header">
+          <div>
+            <div class="messages-title">{{ contact.name }}</div>
+            <div class="messages-subtitle">{{ contact.role }}</div>
+          </div>
+          <a [routerLink]="['/profile', contact.userId]" class="profile-link">Open profile</a>
+        </div>
+
+        <div class="messages-list" #messagesScroll>
+          @if (loadingMessages()) {
+            <p class="empty">Loading messages...</p>
+          } @else {
+            @for (message of messages(); track message.id) {
+              <div class="message-row" [class.mine]="isMine(message)">
+                <div class="bubble">
+                  <p>{{ message.content }}</p>
+                  <small>{{ message.sentAtUtc | date:'dd/MM HH:mm' }}</small>
+                </div>
+              </div>
+            }
+
+            @if (!messages().length) {
+              <p class="empty">No messages yet.</p>
+            }
+          }
+        </div>
+
+        <div class="composer">
+          <input
+            pInputText
+            [ngModel]="draft()"
+            (ngModelChange)="draft.set($event)"
+            (keydown)="onDraftKeydown($event)"
+            placeholder="Type a message" />
+          <p-button label="Send" icon="pi pi-send" (onClick)="send()" [disabled]="!draft().trim()" />
+        </div>
+      } @else {
+        <div class="messages-empty">
+          <p>Select a conversation to start chatting.</p>
+        </div>
+      }
+    </section>
+  </div>
+</div>

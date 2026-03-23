@@ -21,6 +21,9 @@ namespace backend.Services
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return ResultResponse<AuthResponse>.Fail("Invalid email or password.");
 
+            if (!user.IsActive)
+                return ResultResponse<AuthResponse>.Fail("Your account is deactivated. Contact administrator.");
+
             string token = JwtHelper.GenerateToken(user);
 
             AuthResponse authResponse = new()

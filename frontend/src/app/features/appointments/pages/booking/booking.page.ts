@@ -213,6 +213,11 @@ export class BookingPage {
   }
 
   private bookByStart(startUtc: string): void {
+    if (!this.isClient) {
+      this.errorMessage.set('Only user accounts can book appointments.');
+      return;
+    }
+
     const service: ProviderServiceModel | null = this.selectedService();
     if (!service) return;
 

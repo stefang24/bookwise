@@ -49,11 +49,10 @@
           <p-button label="Edit Profile" icon="pi pi-pencil" [outlined]="true" (onClick)="startEditing()" />
         }
         @if (showChatButton) {
-          <p-button label="Chat" icon="pi pi-comments" (onClick)="null" />
+            <p-button label="Chat" icon="pi pi-comments" (onClick)="onChatClick()" />
         }
       </div>
     </div>
-
     @if (isEditing()) {
       <div class="edit-form">
         <h2 class="section-title">Edit Profile</h2>

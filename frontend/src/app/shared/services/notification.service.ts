@@ -9,13 +9,13 @@ export type NotificationSeverity = 'success' | 'info' | 'warn' | 'error';
 export class NotificationService {
   private messageService: MessageService = inject(MessageService);
 
-  show(severity: NotificationSeverity, summary: string, detail: string): void {
+  show(severity: NotificationSeverity, summary: string, detail: string, key: string = 'app', life: number = 3500): void {
     this.messageService.add({
-      key: 'app',
+      key,
       severity,
       summary,
       detail,
-      life: 3500
+      life
     });
   }
 
@@ -33,5 +33,9 @@ export class NotificationService {
 
   error(summary: string, detail: string): void {
     this.show('error', summary, detail);
+  }
+
+  infoTopRight(summary: string, detail: string): void {
+    this.show('info', summary, detail, 'realtime', 4000);
   }
 }

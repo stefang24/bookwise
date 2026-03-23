@@ -31,9 +31,7 @@
     @for (item of items(); track item.id) {
       <a class="provider-card" [routerLink]="['/profile', item.id]">
         <div class="provider-main">
-          @if (getImage(item.profileImagePath)) {
-            <img [src]="getImage(item.profileImagePath)" alt="Provider" class="avatar" />
-          }
+          <img [src]="getImage(item.profileImagePath)" alt="Provider" class="avatar" />
           <div>
             <div class="name">{{ item.name }}</div>
             <div class="meta">{{ item.primaryCategory || 'No category' }}</div>

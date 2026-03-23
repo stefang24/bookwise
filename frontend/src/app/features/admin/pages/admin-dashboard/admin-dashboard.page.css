@@ -1,0 +1,166 @@
+.table-wrap {
+  overflow: auto;
+}
+
+.table-tools {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.table-tools input {
+  min-width: 220px;
+}
+
+.table-select {
+  border: 1px solid #dbe4ee;
+  border-radius: 8px;
+  padding: 0.46rem 0.6rem;
+  background: #fff;
+  color: #1f2937;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.admin-table th,
+.admin-table td {
+  text-align: left;
+  padding: 0.6rem;
+  border-bottom: 1px solid #eef2f7;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.admin-table th {
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.status-pill {
+  border-radius: 999px;
+  font-size: 0.78rem;
+  padding: 0.18rem 0.45rem;
+  border: 1px solid;
+}
+
+.status-pill.active {
+  color: #166534;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.status-pill.inactive {
+  color: #991b1b;
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+
+.stats-filter {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 0.9rem;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stats-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: #fff;
+}
+
+.stats-label {
+  color: #64748b;
+  font-size: 0.84rem;
+}
+
+.stats-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.stats-block {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.stats-chart-wrap {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.chart-block h3 {
+  margin: 0 0 0.5rem;
+}
+
+.chart-host {
+  height: 280px;
+}
+
+.stats-note {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0.5rem 0 0;
+}
+
+.link-button {
+  border: none;
+  background: transparent;
+  color: #1d4ed8;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link-button:hover {
+  color: #1e40af;
+}
+
+.empty {
+  color: #64748b;
+}
+
+@media (max-width: 900px) {
+  .stats-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats-chart-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table-tools {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table-tools input {
+    min-width: 0;
+  }
+}

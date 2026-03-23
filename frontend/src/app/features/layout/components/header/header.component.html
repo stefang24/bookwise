@@ -1,20 +1,65 @@
 <header class="header">
   <div class="header-container">
-    <a routerLink="/home" class="logo">BookWise</a>
+    <a routerLink="/home" class="logo" aria-label="BookWise home">
+      <img src="assets/images/bookwise_logo.png" alt="BookWise" class="logo-image" />
+    </a>
     <nav class="nav">
       <a routerLink="/home" routerLinkActive="active" class="nav-link">Home</a>
       @if (isLoggedIn()) {
         @if (role() === 'Provider') {
+          <a routerLink="/book" routerLinkActive="active" class="nav-link">Browse Services</a>
           <a routerLink="/provider/services" routerLinkActive="active" class="nav-link">My Services</a>
           <a routerLink="/provider/schedule" routerLinkActive="active" class="nav-link">Working Hours</a>
-        } @else {
+        } @else if (role() === 'User') {
           <a routerLink="/book" routerLinkActive="active" class="nav-link">Book</a>
           <a routerLink="/providers" routerLinkActive="active" class="nav-link">Providers</a>
+        } @else if (role() === 'Admin') {
+          <a routerLink="/admin" routerLinkActive="active" class="nav-link">Admin Panel</a>
         }
-        <a routerLink="/appointments" routerLinkActive="active" class="nav-link">Appointments</a>
+
+        @if (!isAdmin()) {
+          <a routerLink="/appointments" routerLinkActive="active" class="nav-link">Appointments</a>
+        }
+
+        @if (isChatRole()) {
+          <a routerLink="/chat" routerLinkActive="active" class="nav-link">Chat</a>
+          <div class="notif-wrap" #notifWrap>
+            <button type="button" class="notif-btn" (click)="toggleNotifications()" aria-label="Notifications">
+              <i class="pi pi-bell"></i>
+              @if (unreadNotifications() > 0) {
+                <span class="notif-badge">{{ unreadNotifications() }}</span>
+              }
+            </button>
+
+            @if (notificationsOpen()) {
+              <div class="notif-panel">
+                <div class="notif-title">Notifications</div>
+                @for (item of notifications(); track item.id) {
+                  <div class="notif-item" [class.unread]="!item.isRead">
+                      <div class="notif-item-content" (click)="openNotification(item)" style="cursor: pointer;">
+                        <div class="notif-item-title">{{ item.title }}</div>
+                        <div class="notif-item-text">{{ item.message }}</div>
+                      </div>
+                      @if (!item.isRead) {
+                        <button type="button" class="notif-read-btn" (click)="markAsRead(item, $event)" title="Mark as read">
+                          <i class="pi pi-check-circle"></i> <span style="font-size: 0.75rem; margin-left: 4px;">Mark as read</span>
+                      </button>
+                    }
+                  </div>
+                }
+                @if (!notifications().length) {
+                  <div class="notif-empty">No notifications.</div>
+                }
+              </div>
+            }
+          </div>
+        }
+
         <a [routerLink]="['/profile', userId()]" routerLinkActive="active" class="nav-link">{{ username() }}</a>
         <p-button label="Logout" [text]="true" severity="secondary" (onClick)="onLogout()" />
       } @else {
+        <a routerLink="/book" routerLinkActive="active" class="nav-link">Services</a>
+        <a routerLink="/providers" routerLinkActive="active" class="nav-link">Providers</a>
         <a routerLink="/login" routerLinkActive="active" class="nav-link">Login</a>
         <a routerLink="/register" routerLinkActive="active" class="nav-link">Register</a>
       }

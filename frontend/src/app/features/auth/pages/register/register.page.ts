@@ -35,6 +35,8 @@ export class RegisterPage {
   city = signal<string>('');
   role = signal<string>('User');
   errorMessage = signal<string>('');
+  companyNameTouched = signal<boolean>(false);
+  registerAttempted = signal<boolean>(false);
 
   emailError = computed<string>(() => {
     const val: string = this.email();
@@ -75,6 +77,10 @@ export class RegisterPage {
     return '';
   });
 
+  showCompanyNameError = computed<boolean>(() => {
+    return this.role() === 'Provider' && !!this.companyNameError() && (this.companyNameTouched() || this.registerAttempted());
+  });
+
   roleOptions = [
     { label: 'User', value: 'User' },
     { label: 'Provider', value: 'Provider' }
@@ -84,8 +90,42 @@ export class RegisterPage {
     return this.loaderService.isLoading('register');
   }
 
-  onRegister(): void {
+  onRoleChange(nextRole: string): void {
+    this.role.set(nextRole);
     this.errorMessage.set('');
+    this.registerAttempted.set(false);
+
+    if (nextRole !== 'Provider') {
+      this.companyName.set('');
+      this.city.set('');
+    }
+
+    this.companyNameTouched.set(false);
+  }
+
+  onCompanyNameChange(value: string): void {
+    this.companyName.set(value);
+    this.companyNameTouched.set(true);
+  }
+
+  onRegister(): void {
+    this.registerAttempted.set(true);
+    this.errorMessage.set('');
+
+    const isProvider: boolean = this.role() === 'Provider';
+    const hasMissingRequired: boolean =
+      !this.email().trim() ||
+      !this.username().trim() ||
+      !this.password() ||
+      !this.confirmPassword() ||
+      (isProvider
+        ? !this.companyName().trim() || !!this.companyNameError()
+        : !this.firstName().trim() || !this.lastName().trim());
+
+    if (hasMissingRequired || this.hasValidationErrors()) {
+      return;
+    }
+
     this.loaderService.show('register');
 
     const request: RegisterRequest = {

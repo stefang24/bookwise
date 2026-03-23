@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { LayoutPage } from './features/layout/pages/layout.page';
-import { authGuard, guestGuard, providerGuard, userGuard } from './shared/guards/auth.guard';
+import { adminGuard, authGuard, chatGuard, guestGuard, providerGuard } from './shared/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -13,7 +13,6 @@ export const routes: Routes = [
       },
       {
         path: 'profile/:id',
-        canActivate: [authGuard],
         loadComponent: () => import('./features/profile/pages/profile/profile.page').then(m => m.ProfilePage)
       },
       {
@@ -28,18 +27,26 @@ export const routes: Routes = [
       },
       {
         path: 'book',
-        canActivate: [userGuard],
         loadComponent: () => import('./features/appointments/pages/booking/booking.page').then(m => m.BookingPage)
       },
       {
         path: 'providers',
-        canActivate: [userGuard],
         loadComponent: () => import('./features/providers/pages/providers/providers.page').then(m => m.ProvidersPage)
       },
       {
         path: 'appointments',
         canActivate: [authGuard],
         loadComponent: () => import('./features/appointments/pages/history/history.page').then(m => m.HistoryPage)
+      },
+      {
+        path: 'chat',
+        canActivate: [chatGuard],
+        loadComponent: () => import('./features/chat/pages/chat/chat.page').then(m => m.ChatPage)
+      },
+      {
+        path: 'admin',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./features/admin/pages/admin-dashboard/admin-dashboard.page').then(m => m.AdminDashboardPage)
       },
       {
         path: '',
@@ -57,6 +64,14 @@ export const routes: Routes = [
     path: 'register',
     canActivate: [guestGuard],
     loadComponent: () => import('./features/auth/pages/register/register.page').then(m => m.RegisterPage)
+  },
+  {
+    path: 'forbidden',
+    loadComponent: () => import('./features/errors/pages/forbidden/forbidden.page').then(m => m.ForbiddenPage)
+  },
+  {
+    path: 'internal-server-error',
+    loadComponent: () => import('./features/errors/pages/internal-server-error/internal-server-error.page').then(m => m.InternalServerErrorPage)
   },
   {
     path: '**',

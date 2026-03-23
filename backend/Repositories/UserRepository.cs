@@ -83,5 +83,21 @@ namespace backend.Repositories
 
             return await providers.ToListAsync();
         }
+
+        public async Task<List<User>> GetTopProvidersByAppointmentsAsync(int limit)
+        {
+            int safeLimit = Math.Max(1, limit);
+
+            return await _context.Users
+                .Include(x => x.ProviderServices.Where(s => s.IsActive))
+                .Where(x => x.Role == UserRole.Provider)
+                .Where(x => x.ProviderServices.Any(s => s.IsActive))
+                .OrderByDescending(x => x.ProviderServices
+                    .SelectMany(s => s.Appointments)
+                    .Count(a => a.Status != AppointmentStatus.Cancelled))
+                .ThenBy(x => x.CompanyName ?? (x.FirstName + " " + x.LastName).Trim())
+                .Take(safeLimit)
+                .ToListAsync();
+        }
     }
 }

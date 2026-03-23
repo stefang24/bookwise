@@ -25,9 +25,14 @@ namespace backend.Models
         public string? City { get; set; }
         public string? Address { get; set; }
         public string? Website { get; set; }
+        public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public ICollection<ProviderService> ProviderServices { get; set; } = [];
         public ICollection<ProviderWorkingHour> WorkingHours { get; set; } = [];
         public ICollection<Appointment> ClientAppointments { get; set; } = [];
+        public ICollection<Chat> ChatsInitiated { get; set; } = [];        
+        public ICollection<Chat> ChatsReceived { get; set; } = [];    
+        public ICollection<ChatMessage> SentMessages { get; set; } = [];    
+        public ICollection<AppNotification> Notifications { get; set; } = [];
     }
 }

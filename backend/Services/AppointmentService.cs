@@ -1,6 +1,8 @@
 using backend.DTOs;
 using backend.Models;
 using backend.Repositories;
+using backend.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Services
 {
@@ -10,13 +12,17 @@ namespace backend.Services
         private readonly IProviderServiceRepository _providerServiceRepository;
         private readonly IWorkingHoursRepository _workingHoursRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IChatRepository _chatRepository;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public AppointmentService(IAppointmentRepository appointmentRepository, IProviderServiceRepository providerServiceRepository, IWorkingHoursRepository workingHoursRepository, IUserRepository userRepository)
+        public AppointmentService(IAppointmentRepository appointmentRepository, IProviderServiceRepository providerServiceRepository, IWorkingHoursRepository workingHoursRepository, IUserRepository userRepository, IChatRepository chatRepository, IHubContext<ChatHub> hubContext)
         {
             _appointmentRepository = appointmentRepository;
             _providerServiceRepository = providerServiceRepository;
             _workingHoursRepository = workingHoursRepository;
             _userRepository = userRepository;
+            _chatRepository = chatRepository;
+            _hubContext = hubContext;
         }
 
         public async Task MarkPastAppointmentsCompletedAsync()
@@ -53,16 +59,17 @@ namespace backend.Services
             if (workingHour == null || !workingHour.IsWorking || !workingHour.StartTime.HasValue || !workingHour.EndTime.HasValue)
                 return ResultResponse<List<AvailableSlotResponse>>.Ok([]);
 
-            DateTime dayStartUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.StartTime.Value)), DateTimeKind.Utc);
-            DateTime dayEndUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.EndTime.Value)), DateTimeKind.Utc);
+                // Treat working hours as UTC for consistency
+                DateTime dayStartUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.StartTime.Value)), DateTimeKind.Utc);
+                DateTime dayEndUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.EndTime.Value)), DateTimeKind.Utc);
 
-            List<Appointment> booked = await _appointmentRepository.GetScheduledByProviderForDateAsync(service.ProviderId, dayStartUtc);
+                List<Appointment> booked = await _appointmentRepository.GetScheduledByProviderForDateAsync(service.ProviderId, day);
 
             List<AvailableSlotResponse> slots = [];
             DateTime nowUtc = DateTime.UtcNow;
-            DateTime cursor = dayStartUtc;
+                DateTime cursor = dayStartUtc;
 
-            while (cursor.AddMinutes(service.DurationMinutes) <= dayEndUtc)
+                while (cursor.AddMinutes(service.DurationMinutes) <= dayEndUtc)
             {
                 DateTime slotEnd = cursor.AddMinutes(service.DurationMinutes);
 
@@ -72,8 +79,8 @@ namespace backend.Services
                 {
                     slots.Add(new AvailableSlotResponse
                     {
-                        StartUtc = cursor,
-                        EndUtc = slotEnd
+                        StartUtc = DateTime.SpecifyKind(cursor, DateTimeKind.Unspecified),
+                        EndUtc = DateTime.SpecifyKind(slotEnd, DateTimeKind.Unspecified)
                     });
                 }
 
@@ -102,16 +109,17 @@ namespace backend.Services
             if (workingHour == null || !workingHour.IsWorking || !workingHour.StartTime.HasValue || !workingHour.EndTime.HasValue)
                 return ResultResponse<List<CalendarSlotResponse>>.Ok([]);
 
-            DateTime dayStartUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.StartTime.Value)), DateTimeKind.Utc);
-            DateTime dayEndUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.EndTime.Value)), DateTimeKind.Utc);
+                // Treat working hours as UTC for consistency
+                DateTime dayStartUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.StartTime.Value)), DateTimeKind.Utc);
+                DateTime dayEndUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.EndTime.Value)), DateTimeKind.Utc);
 
-            List<Appointment> booked = await _appointmentRepository.GetScheduledByProviderForDateAsync(service.ProviderId, dayStartUtc);
+                List<Appointment> booked = await _appointmentRepository.GetScheduledByProviderForDateAsync(service.ProviderId, day);
 
             DateTime nowUtc = DateTime.UtcNow;
-            DateTime cursor = dayStartUtc;
+                DateTime cursor = dayStartUtc;
             List<CalendarSlotResponse> slots = [];
 
-            while (cursor.AddMinutes(service.DurationMinutes) <= dayEndUtc)
+                while (cursor.AddMinutes(service.DurationMinutes) <= dayEndUtc)
             {
                 DateTime slotEnd = cursor.AddMinutes(service.DurationMinutes);
                 bool conflicts = booked.Any(x => x.StartUtc < slotEnd && x.EndUtc > cursor);
@@ -119,8 +127,8 @@ namespace backend.Services
 
                 slots.Add(new CalendarSlotResponse
                 {
-                    StartUtc = cursor,
-                    EndUtc = slotEnd,
+                    StartUtc = DateTime.SpecifyKind(cursor, DateTimeKind.Unspecified),
+                    EndUtc = DateTime.SpecifyKind(slotEnd, DateTimeKind.Unspecified),
                     IsAvailable = available
                 });
 
@@ -181,6 +189,25 @@ namespace backend.Services
             User? client = await _userRepository.GetByIdAsync(clientId);
             if (client == null)
                 return ResultResponse<AppointmentResponse>.Fail("Client not found.");
+
+            // Create notification for provider
+            string clientName = client.CompanyName ?? (client.FirstName + " " + client.LastName).Trim();
+            AppNotification notification = await _chatRepository.CreateAppointmentNotificationAsync(service.ProviderId, clientId, clientName, appointment);
+            await _chatRepository.SaveChangesAsync();
+
+            // Send notification via SignalR to provider
+            AppNotificationResponse notificationResponse = new()
+            {
+                Id = notification.Id,
+                Type = notification.Type,
+                Title = notification.Title,
+                Message = notification.Message,
+                IsRead = notification.IsRead,
+                RelatedUserId = notification.RelatedUserId,
+                RelatedUserName = clientName,
+                CreatedAtUtc = notification.CreatedAtUtc
+            };
+            await _hubContext.Clients.Group($"user-{service.ProviderId}").SendAsync("NotificationReceived", notificationResponse);
 
             return ResultResponse<AppointmentResponse>.Ok(Map(appointment, service, client));
         }

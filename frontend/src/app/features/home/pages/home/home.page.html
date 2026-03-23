@@ -1,4 +1,125 @@
-<div class="home-container">
-  <h1 class="home-title">BookWise</h1>
-  <p class="home-subtitle">Your personal book companion</p>
+<div class="home-wrapper">
+  <section class="hero">
+    <div class="hero-container">
+      <img src="/assets/images/bookwise_logo.png" alt="BookWise" class="hero-logo" />
+      <h1 class="hero-title">BookWise</h1>
+      <p class="hero-subtitle">Connect with service providers. Book with confidence.</p>
+      <p class="hero-description">Discover and book services from trusted professionals in your area. Whether you're looking for services or offering them, BookWise brings it all together.</p>
+      <div class="hero-cta">
+        @if (isAdmin()) {
+          <a routerLink="/admin" routerLinkActive="active">
+            <p-button label="Open Admin Panel" icon="pi pi-chart-bar" />
+          </a>
+        } @else {
+          <a routerLink="/book" routerLinkActive="active">
+            <p-button label="Browse Services" icon="pi pi-search" />
+          </a>
+          <a routerLink="/register" routerLinkActive="active">
+            <p-button label="Become a Provider" icon="pi pi-briefcase" severity="secondary" />
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  @if (isAdmin()) {
+    <section class="admin-preview">
+      <div class="section-container">
+        <h2 class="section-title">Admin Overview</h2>
+        <p class="section-subtitle">Quick snapshot of platform activity</p>
+        @if (adminPreviewStats(); as stats) {
+          <div class="admin-preview-grid">
+            <div class="admin-preview-card">
+              <div class="admin-preview-label">Total Users</div>
+              <div class="admin-preview-value">{{ stats.totalUsers }}</div>
+            </div>
+            <div class="admin-preview-card">
+              <div class="admin-preview-label">Providers</div>
+              <div class="admin-preview-value">{{ stats.totalProviders }}</div>
+            </div>
+            <div class="admin-preview-card">
+              <div class="admin-preview-label">Appointments</div>
+              <div class="admin-preview-value">{{ stats.totalAppointments }}</div>
+            </div>
+            <div class="admin-preview-card">
+              <div class="admin-preview-label">Completed</div>
+              <div class="admin-preview-value">{{ stats.completedAppointments }}</div>
+            </div>
+          </div>
+        }
+        <div class="admin-preview-cta">
+          <a routerLink="/admin">
+            <p-button label="Go to Admin Dashboard" icon="pi pi-arrow-right" severity="contrast" />
+          </a>
+        </div>
+      </div>
+    </section>
+  }
+
+  @if (featuredServices().length > 0) {
+    <section class="featured-services">
+      <div class="section-container">
+        <h2 class="section-title">Featured Services</h2>
+        <p class="section-subtitle">Popular services available now</p>
+        <div class="services-grid">
+          @for (service of featuredServices(); track service.id) {
+            <div class="service-card">
+              <img [src]="getServiceImageUrl(service)" [alt]="service.name" class="service-image" />
+              <div class="service-content">
+                <h3 class="service-name">{{ service.name }}</h3>
+                <p class="service-provider">by {{ service.providerName }}</p>
+                <p class="service-category">{{ service.category }}</p>
+                <div class="service-footer">
+                  <span class="service-price">€{{ service.priceEur }}</span>
+                  <span class="service-duration">{{ service.durationMinutes }}m</span>
+                </div>
+                <div class="service-actions">
+                  <a [routerLink]="['/profile', service.providerId]">
+                    <p-button label="View Provider" severity="secondary" size="small" />
+                  </a>
+                  <a [routerLink]="['/book']" [queryParams]="{ serviceId: service.id }">
+                  <p-button label="Book" severity="info" size="small" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  @if (topProviders().length > 0) {
+    <section class="top-providers">
+      <div class="section-container">
+        <h2 class="section-title">Top Providers</h2>
+        <p class="section-subtitle">Meet highly-rated professionals</p>
+        <div class="providers-grid">
+          @for (provider of topProviders(); track provider.id) {
+            <div class="provider-card">
+              <img [src]="getProviderImageUrl(provider)" [alt]="provider.name" class="provider-image" />
+              <div class="provider-content">
+                <h3 class="provider-name">{{ provider.name }}</h3>
+                <p class="provider-city">📍 {{ provider.city }}</p>
+                <p class="provider-services">{{ provider.servicesCount }} service(s)</p>
+                <a [routerLink]="['/profile', provider.id]">
+                  <p-button label="View Profile" severity="secondary" size="small" />
+                </a>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <section class="cta-section">
+    <div class="cta-container">
+      <h2>Ready to get started?</h2>
+      <p>Join thousands of users who trust BookWise for their service needs.</p>
+      <a routerLink="/register">
+        <p-button label="Sign Up Now" size="large" />
+      </a>
+    </div>
+  </section>
 </div>

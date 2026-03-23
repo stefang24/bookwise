@@ -6,6 +6,7 @@
     </a>
 
     <div class="auth-header">
+      <img src="/assets/images/bookwise_logo.png" alt="BookWise" class="auth-logo" />
       <h1 class="auth-title">Create account</h1>
       <p class="auth-subtitle">Join BookWise today</p>
     </div>
@@ -20,7 +21,7 @@
         <p-selectbutton
           [options]="roleOptions"
           [ngModel]="role()"
-          (ngModelChange)="role.set($event)"
+          (ngModelChange)="onRoleChange($event)"
           name="role"
           optionLabel="label"
           optionValue="value" />
@@ -33,11 +34,11 @@
             id="companyName"
             type="text"
             [ngModel]="companyName()"
-            (ngModelChange)="companyName.set($event)"
+            (ngModelChange)="onCompanyNameChange($event)"
             name="companyName"
             placeholder="Enter company name"
             class="w-full" />
-          @if (companyNameError()) {
+          @if (showCompanyNameError()) {
             <small class="field-error">{{ companyNameError() }}</small>
           }
         </div>

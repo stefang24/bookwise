@@ -16,6 +16,7 @@ import { toAssetUrl } from '../../../../shared/config/api.config';
   styleUrl: './providers.page.css'
 })
 export class ProvidersPage {
+  private readonly defaultProfileImagePath: string = '/images/profiles/default.png';
   private providerCatalogService: ProviderCatalogService = inject(ProviderCatalogService);
 
   items = signal<ProviderDirectoryItemModel[]>([]);
@@ -69,7 +70,7 @@ export class ProvidersPage {
     });
   }
 
-  getImage(path: string | null): string | null {
-    return toAssetUrl(path);
+  getImage(path: string | null): string {
+    return toAssetUrl(path) ?? toAssetUrl(this.defaultProfileImagePath)!;
   }
 }

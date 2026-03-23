@@ -69,6 +69,13 @@ namespace backend.Controllers
             return Ok(response);
         }
 
+        [HttpGet("featured-services")]
+        public async Task<IActionResult> FeaturedServices([FromQuery] int limit = 3)
+        {
+            ResultResponse<List<ProviderServiceResponse>> response = await _providerCatalogService.GetFeaturedServicesAsync(limit);
+            return Ok(response);
+        }
+
         [HttpGet("provider/{providerId:int}")]
         public async Task<IActionResult> GetByProvider(int providerId)
         {
@@ -87,6 +94,13 @@ namespace backend.Controllers
         public async Task<IActionResult> Providers([FromQuery] string? category, [FromQuery] string? city, [FromQuery] string? query, [FromQuery] string? sortBy)
         {
             ResultResponse<List<ProviderDirectoryItemResponse>> response = await _providerCatalogService.GetProvidersAsync(category, city, query, sortBy);
+            return Ok(response);
+        }
+
+        [HttpGet("top-providers")]
+        public async Task<IActionResult> TopProviders([FromQuery] int limit = 3)
+        {
+            ResultResponse<List<ProviderDirectoryItemResponse>> response = await _providerCatalogService.GetTopProvidersAsync(limit);
             return Ok(response);
         }
     }

@@ -43,6 +43,11 @@ export class ProviderCatalogService {
     return this.http.get<ResultResponse<ProviderServiceModel[]>>(`${this.API_URL}/search`, { params });
   }
 
+  getFeaturedServices(limit: number = 3): Observable<ResultResponse<ProviderServiceModel[]>> {
+    const params: HttpParams = new HttpParams().set('limit', String(limit));
+    return this.http.get<ResultResponse<ProviderServiceModel[]>>(`${this.API_URL}/featured-services`, { params });
+  }
+
   getByProvider(providerId: number): Observable<ResultResponse<ProviderServiceModel[]>> {
     return this.http.get<ResultResponse<ProviderServiceModel[]>>(`${this.API_URL}/provider/${providerId}`);
   }
@@ -58,5 +63,10 @@ export class ProviderCatalogService {
     if (query.trim()) params = params.set('query', query.trim());
     if (sortBy.trim()) params = params.set('sortBy', sortBy.trim());
     return this.http.get<ResultResponse<ProviderDirectoryItemModel[]>>(`${this.API_URL}/providers`, { params });
+  }
+
+  getTopProviders(limit: number = 3): Observable<ResultResponse<ProviderDirectoryItemModel[]>> {
+    const params: HttpParams = new HttpParams().set('limit', String(limit));
+    return this.http.get<ResultResponse<ProviderDirectoryItemModel[]>>(`${this.API_URL}/top-providers`, { params });
   }
 }

@@ -25,6 +25,8 @@ namespace backend.Extensions
             services.AddScoped<IProviderServiceRepository, ProviderServiceRepository>();
             services.AddScoped<IWorkingHoursRepository, WorkingHoursRepository>();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddScoped<IChatRepository, ChatRepository>();
+            services.AddScoped<IAdminRepository, AdminRepository>();
 
             return services;
         }
@@ -36,6 +38,8 @@ namespace backend.Extensions
             services.AddScoped<IProviderCatalogService, ProviderCatalogService>();
             services.AddScoped<IWorkingHoursService, WorkingHoursService>();
             services.AddScoped<IAppointmentService, AppointmentService>();
+            services.AddScoped<IChatService, ChatService>();
+            services.AddScoped<IAdminService, AdminService>();
 
             return services;
         }
@@ -59,6 +63,20 @@ namespace backend.Extensions
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        string? accessToken = context.Request.Query["access_token"];
+                        PathString path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+                            context.Token = accessToken;
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
             return services;
@@ -70,7 +88,8 @@ namespace backend.Extensions
             {
                 options.AddPolicy("AllowAngular", policy =>
                 {
-                    policy.AllowAnyOrigin()
+                    policy.WithOrigins("http://localhost:4200", "http://localhost:4200/")
+                          .AllowCredentials()
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });

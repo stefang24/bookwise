@@ -48,6 +48,19 @@ namespace backend.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<ProviderService>> GetTopBookedActiveAsync(int limit)
+        {
+            int safeLimit = Math.Max(1, limit);
+
+            return await _context.ProviderServices
+                .Include(x => x.Provider)
+                .Where(x => x.IsActive && x.Provider.Role == UserRole.Provider)
+                .OrderByDescending(x => x.Appointments.Count(a => a.Status != AppointmentStatus.Cancelled))
+                .ThenBy(x => x.Name)
+                .Take(safeLimit)
+                .ToListAsync();
+        }
+
         public async Task<List<ProviderService>> SearchActiveAsync(string? category, string? query)
         {
             IQueryable<ProviderService> services = _context.ProviderServices

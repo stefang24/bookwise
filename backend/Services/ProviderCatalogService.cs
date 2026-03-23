@@ -174,6 +174,13 @@ namespace backend.Services
             return ResultResponse<List<ProviderServiceResponse>>.Ok(services.Select(x => Map(x, x.Provider)).ToList());
         }
 
+        public async Task<ResultResponse<List<ProviderServiceResponse>>> GetFeaturedServicesAsync(int limit)
+        {
+            List<ProviderService> services = await _providerServiceRepository.GetTopBookedActiveAsync(limit);
+
+            return ResultResponse<List<ProviderServiceResponse>>.Ok(services.Select(x => Map(x, x.Provider)).ToList());
+        }
+
         public async Task<ResultResponse<List<ProviderServiceResponse>>> GetByProviderAsync(int providerId)
         {
             List<ProviderService> services = await _providerServiceRepository.GetByProviderActiveAsync(providerId);
@@ -222,6 +229,27 @@ namespace backend.Services
                 "city" => result.OrderBy(x => x.City).ThenBy(x => x.Name).ToList(),
                 _ => result.OrderBy(x => x.Name).ToList()
             };
+
+            return ResultResponse<List<ProviderDirectoryItemResponse>>.Ok(result);
+        }
+
+        public async Task<ResultResponse<List<ProviderDirectoryItemResponse>>> GetTopProvidersAsync(int limit)
+        {
+            List<User> providers = await _userRepository.GetTopProvidersByAppointmentsAsync(limit);
+
+            List<ProviderDirectoryItemResponse> result = providers
+                .Select(x => new ProviderDirectoryItemResponse
+                {
+                    Id = x.Id,
+                    Name = x.CompanyName ?? (x.FirstName + " " + x.LastName).Trim(),
+                    Username = x.Username,
+                    ProfileImagePath = x.ProfileImagePath,
+                    PrimaryCategory = x.PrimaryCategory,
+                    City = x.City,
+                    Address = x.Address,
+                    ServicesCount = x.ProviderServices.Count(s => s.IsActive)
+                })
+                .ToList();
 
             return ResultResponse<List<ProviderDirectoryItemResponse>>.Ok(result);
         }

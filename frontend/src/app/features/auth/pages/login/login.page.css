@@ -46,6 +46,14 @@
   margin-bottom: 2rem;
 }
 
+.auth-logo {
+  width: 210px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto 1rem;
+}
+
 .auth-title {
   font-size: 1.75rem;
   font-weight: 700;
@@ -117,6 +125,11 @@
   .auth-title {
     font-size: 1.5rem;
   }
+
+  .auth-logo {
+    width: 175px;
+    margin-bottom: 0.85rem;
+  }
 }
 
 @media (max-width: 320px) {
@@ -135,5 +148,9 @@
 
   .auth-subtitle {
     font-size: 0.813rem;
+  }
+
+  .auth-logo {
+    width: 150px;
   }
 }

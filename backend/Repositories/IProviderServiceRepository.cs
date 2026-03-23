@@ -9,6 +9,7 @@ namespace backend.Repositories
         Task<ProviderService?> GetByIdAndProviderAsync(int serviceId, int providerId);
         Task<ProviderService?> GetByIdAndProviderWithProviderAsync(int serviceId, int providerId);
         Task<List<ProviderService>> GetByProviderActiveAsync(int providerId);
+        Task<List<ProviderService>> GetTopBookedActiveAsync(int limit);
         Task<List<ProviderService>> SearchActiveAsync(string? category, string? query);
         Task<List<string>> GetActiveCategoriesAsync();
         Task AddAsync(ProviderService entity);
