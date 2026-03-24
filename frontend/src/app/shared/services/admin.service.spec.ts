@@ -124,7 +124,7 @@ describe('AdminService', () => {
     service.getStats().subscribe((response) => {
       if (response.data) {
         const completionRate = (response.data.completedAppointments / response.data.totalAppointments) * 100;
-        expect(completionRate).toBe(78); // 390/500 * 100
+        expect(completionRate).toBe(78);
       }
     });
 
@@ -138,7 +138,7 @@ describe('AdminService', () => {
     service.getStats().subscribe((response) => {
       if (response.data) {
         const cancellationRate = (response.data.cancelledAppointments / response.data.totalAppointments) * 100;
-        expect(cancellationRate).toBe(12); // 60/500 * 100
+        expect(cancellationRate).toBe(12);
       }
     });
 

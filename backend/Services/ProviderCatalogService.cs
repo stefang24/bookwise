@@ -1,4 +1,5 @@
 using backend.DTOs;
+using backend.Helpers;
 using backend.Models;
 using backend.Repositories;
 
@@ -9,32 +10,6 @@ namespace backend.Services
         private readonly IProviderServiceRepository _providerServiceRepository;
         private readonly IUserRepository _userRepository;
         private readonly IWebHostEnvironment _environment;
-        private static readonly HashSet<string> AllowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-        private static readonly List<string> PredefinedCategories =
-        [
-            "Haircut",
-            "Barber",
-            "Nails",
-            "Makeup",
-            "Skincare",
-            "Massage",
-            "Eyebrows",
-            "Eyelashes",
-            "Waxing",
-            "Spa",
-            "Fitness",
-            "Personal Training",
-            "Physiotherapy",
-            "Photography",
-            "Tutoring",
-            "Cleaning",
-            "Repair",
-            "Plumbing",
-            "Electrical",
-            "Car Service"
-        ];
-        private const long MaxFileSize = 5 * 1024 * 1024;
-        private const string DefaultServiceImageUrl = "/images/services/default-service.svg";
 
         public ProviderCatalogService(IProviderServiceRepository providerServiceRepository, IUserRepository userRepository, IWebHostEnvironment environment)
         {
@@ -61,7 +36,7 @@ namespace backend.Services
                 Name = request.Name.Trim(),
                 Category = request.Category.Trim(),
                 Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
-                ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? DefaultServiceImageUrl : request.ImageUrl.Trim(),
+                ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? ConfigProvider.DefaultServiceImagePath : request.ImageUrl.Trim(),
                 PriceEur = request.PriceEur,
                 DurationMinutes = request.DurationMinutes
             };
@@ -84,9 +59,9 @@ namespace backend.Services
             if (request.PriceEur < 0)
                 return ResultResponse<ProviderServiceResponse>.Fail("Price must be non-negative.");
 
-            string newImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? DefaultServiceImageUrl : request.ImageUrl.Trim();
+            string newImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? ConfigProvider.DefaultServiceImagePath : request.ImageUrl.Trim();
 
-            if (service.ImageUrl != newImageUrl && service.ImageUrl != DefaultServiceImageUrl && !string.IsNullOrEmpty(service.ImageUrl))
+            if (service.ImageUrl != newImageUrl && service.ImageUrl != ConfigProvider.DefaultServiceImagePath && !string.IsNullOrEmpty(service.ImageUrl))
                 DeleteImageFile(service.ImageUrl);
 
             service.Name = request.Name.Trim();
@@ -108,7 +83,7 @@ namespace backend.Services
             if (service == null)
                 return ResultResponse<bool>.Fail("Service not found.");
 
-            if (!string.IsNullOrEmpty(service.ImageUrl) && service.ImageUrl != DefaultServiceImageUrl)
+            if (!string.IsNullOrEmpty(service.ImageUrl) && service.ImageUrl != ConfigProvider.DefaultServiceImagePath)
                 DeleteImageFile(service.ImageUrl);
 
             service.IsActive = false;
@@ -126,21 +101,21 @@ namespace backend.Services
             if (file.Length == 0)
                 return ResultResponse<string>.Fail("File is empty.");
 
-            if (file.Length > MaxFileSize)
+            if (file.Length > ConfigProvider.MaxImageFileSizeBytes)
                 return ResultResponse<string>.Fail("File size must be less than 5MB.");
 
             string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
 
-            if (!AllowedExtensions.Contains(extension))
-                return ResultResponse<string>.Fail("Only image files are allowed (.jpg, .jpeg, .png, .gif, .webp).");
+            if (!ConfigProvider.AllowedImageExtensions.Contains(extension))
+                return ResultResponse<string>.Fail($"Only image files are allowed ({ConfigProvider.AllowedImageExtensionsText}).");
 
             if (!file.ContentType.StartsWith("image/"))
                 return ResultResponse<string>.Fail("Only image files are allowed.");
 
-            string uploadsFolder = Path.Combine(_environment.WebRootPath, "images", "services");
+            string uploadsFolder = Path.Combine(_environment.WebRootPath, ConfigProvider.ServiceImagesFolderRelativePath);
             Directory.CreateDirectory(uploadsFolder);
 
-            string fileName = $"svc_{providerId}_{Guid.NewGuid()}{extension}";
+            string fileName = $"{ConfigProvider.ServiceImageFilePrefix}_{providerId}_{Guid.NewGuid()}{extension}";
             string filePath = Path.Combine(uploadsFolder, fileName);
 
             using (FileStream stream = new(filePath, FileMode.Create))
@@ -148,14 +123,14 @@ namespace backend.Services
                 await file.CopyToAsync(stream);
             }
 
-            string imageUrl = $"/images/services/{fileName}";
+            string imageUrl = $"/{ConfigProvider.ServiceImagesFolderRelativePath.Replace(Path.DirectorySeparatorChar, '/')}/{fileName}";
             return ResultResponse<string>.Ok(imageUrl);
         }
 
         private void DeleteImageFile(string imageUrl)
         {
             string fileName = Path.GetFileName(imageUrl);
-            string filePath = Path.Combine(_environment.WebRootPath, "images", "services", fileName);
+            string filePath = Path.Combine(_environment.WebRootPath, ConfigProvider.ServiceImagesFolderRelativePath, fileName);
             if (File.Exists(filePath))
                 File.Delete(filePath);
         }
@@ -192,7 +167,7 @@ namespace backend.Services
         {
             List<string> customCategories = await _providerServiceRepository.GetActiveCategoriesAsync();
 
-            List<string> categories = PredefinedCategories
+            List<string> categories = ConfigProvider.ProviderPredefinedCategories
                 .Concat(customCategories)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(x => x.Trim())

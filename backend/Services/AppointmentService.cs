@@ -58,8 +58,6 @@ namespace backend.Services
 
             if (workingHour == null || !workingHour.IsWorking || !workingHour.StartTime.HasValue || !workingHour.EndTime.HasValue)
                 return ResultResponse<List<AvailableSlotResponse>>.Ok([]);
-
-                // Treat working hours as UTC for consistency
                 DateTime dayStartUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.StartTime.Value)), DateTimeKind.Utc);
                 DateTime dayEndUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.EndTime.Value)), DateTimeKind.Utc);
 
@@ -108,8 +106,6 @@ namespace backend.Services
 
             if (workingHour == null || !workingHour.IsWorking || !workingHour.StartTime.HasValue || !workingHour.EndTime.HasValue)
                 return ResultResponse<List<CalendarSlotResponse>>.Ok([]);
-
-                // Treat working hours as UTC for consistency
                 DateTime dayStartUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.StartTime.Value)), DateTimeKind.Utc);
                 DateTime dayEndUtc = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.FromTimeSpan(workingHour.EndTime.Value)), DateTimeKind.Utc);
 
@@ -189,13 +185,9 @@ namespace backend.Services
             User? client = await _userRepository.GetByIdAsync(clientId);
             if (client == null)
                 return ResultResponse<AppointmentResponse>.Fail("Client not found.");
-
-            // Create notification for provider
             string clientName = client.CompanyName ?? (client.FirstName + " " + client.LastName).Trim();
             AppNotification notification = await _chatRepository.CreateAppointmentNotificationAsync(service.ProviderId, clientId, clientName, appointment);
             await _chatRepository.SaveChangesAsync();
-
-            // Send notification via SignalR to provider
             AppNotificationResponse notificationResponse = new()
             {
                 Id = notification.Id,

@@ -88,7 +88,6 @@ export class ChatService {
     });
 
     this.hubConnection.on('ChatCreated', (data: any) => {
-      // Notify that a new chat has been created, trigger refresh of contacts
       this.refreshContactsSubject.next();
     });
 
@@ -112,7 +111,6 @@ export class ChatService {
     try {
       await this.hubConnection.stop();
     } catch {
-      // Best effort cleanup.
     } finally {
       this.hubConnection = null;
       this.connectionToken = null;
@@ -189,12 +187,9 @@ export class ChatService {
         osc.start(context.currentTime + startTime);
         osc.stop(context.currentTime + startTime + duration);
       };
-
-      // Pleasant double-chime (A5 -> E6)
       playNote(880.00, 0, 0.3);
       playNote(1318.51, 0.15, 0.4);
     } catch {
-      // Ignore audio failures silently.
     }
   }
 }

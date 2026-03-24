@@ -1,4 +1,5 @@
 using backend.DTOs;
+using backend.Helpers;
 using backend.Models;
 using backend.Repositories;
 
@@ -8,10 +9,6 @@ namespace backend.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IWebHostEnvironment _environment;
-
-        private static readonly HashSet<string> AllowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-        private const long MaxFileSize = 5 * 1024 * 1024;
-        public const string DefaultImagePath = "/images/profiles/default.png";
 
         public ProfileService(IUserRepository userRepository, IWebHostEnvironment environment)
         {
@@ -91,28 +88,28 @@ namespace backend.Services
             if (file.Length == 0)
                 return ResultResponse<ProfileResponse>.Fail("File is empty.");
 
-            if (file.Length > MaxFileSize)
+            if (file.Length > ConfigProvider.MaxImageFileSizeBytes)
                 return ResultResponse<ProfileResponse>.Fail("File size must be less than 5MB.");
 
             string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
 
-            if (!AllowedExtensions.Contains(extension))
-                return ResultResponse<ProfileResponse>.Fail("Only image files are allowed (.jpg, .jpeg, .png, .gif, .webp).");
+            if (!ConfigProvider.AllowedImageExtensions.Contains(extension))
+                return ResultResponse<ProfileResponse>.Fail($"Only image files are allowed ({ConfigProvider.AllowedImageExtensionsText}).");
 
             if (!file.ContentType.StartsWith("image/"))
                 return ResultResponse<ProfileResponse>.Fail("Only image files are allowed.");
 
-            string uploadsFolder = Path.Combine(_environment.WebRootPath, "images", "profiles");
+            string uploadsFolder = Path.Combine(_environment.WebRootPath, ConfigProvider.ProfileImagesFolderRelativePath);
             Directory.CreateDirectory(uploadsFolder);
 
-            if (!string.IsNullOrEmpty(user.ProfileImagePath) && user.ProfileImagePath != DefaultImagePath)
+            if (!string.IsNullOrEmpty(user.ProfileImagePath) && user.ProfileImagePath != ConfigProvider.DefaultProfileImagePath)
             {
                 string oldFilePath = Path.Combine(_environment.WebRootPath, user.ProfileImagePath.TrimStart('/'));
                 if (File.Exists(oldFilePath))
                     File.Delete(oldFilePath);
             }
 
-            string fileName = $"{userId}_{Guid.NewGuid()}{extension}";
+            string fileName = $"{ConfigProvider.ProfileImageFilePrefix}_{userId}_{Guid.NewGuid()}{extension}";
             string filePath = Path.Combine(uploadsFolder, fileName);
 
             using (FileStream stream = new(filePath, FileMode.Create))
@@ -120,7 +117,7 @@ namespace backend.Services
                 await file.CopyToAsync(stream);
             }
 
-            user.ProfileImagePath = $"/images/profiles/{fileName}";
+            user.ProfileImagePath = $"/{ConfigProvider.ProfileImagesFolderRelativePath.Replace(Path.DirectorySeparatorChar, '/')}/{fileName}";
             await _userRepository.UpdateAsync(user);
 
             ProfileResponse profile = MapToProfileResponse(user);

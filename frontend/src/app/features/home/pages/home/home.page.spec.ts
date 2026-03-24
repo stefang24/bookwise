@@ -54,8 +54,8 @@ describe('HomePage', () => {
 
   beforeEach(async () => {
     const catalogStub = {
-      search: () => of({ success: true, data: [mockService] }),
-      getProviders: () => of({ success: true, data: [mockProvider] })
+      getFeaturedServices: () => of({ success: true, data: [mockService] }),
+      getTopProviders: () => of({ success: true, data: [mockProvider] })
     };
 
     const adminStub = {

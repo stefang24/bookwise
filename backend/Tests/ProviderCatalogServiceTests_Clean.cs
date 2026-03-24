@@ -1,6 +1,7 @@
 using Xunit;
 using Moq;
 using backend.Services;
+using backend.Helpers;
 using backend.DTOs;
 using backend.Models;
 using backend.Repositories;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace backend.Tests.Services.Obsolete
 {
@@ -20,6 +22,27 @@ namespace backend.Tests.Services.Obsolete
 
     public ProviderCatalogServiceTestsOld()
         {
+            ConfigProvider.Initialize(new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["JwtSettings:Secret"] = "super-secret-key-for-tests-123456789",
+                    ["AppConfig:Defaults:ProfileImagePath"] = "/images/profiles/default.png",
+                    ["AppConfig:Defaults:ServiceImagePath"] = "/images/services/default-service.svg",
+                    ["AppConfig:Uploads:MaxImageFileSizeBytes"] = "5242880",
+                    ["AppConfig:Uploads:AllowedImageExtensions:0"] = ".jpg",
+                    ["AppConfig:Uploads:AllowedImageExtensions:1"] = ".jpeg",
+                    ["AppConfig:Uploads:AllowedImageExtensions:2"] = ".png",
+                    ["AppConfig:Uploads:AllowedImageExtensions:3"] = ".gif",
+                    ["AppConfig:Uploads:AllowedImageExtensions:4"] = ".webp",
+                    ["AppConfig:Uploads:ProfileImagesFolder"] = "images/profiles",
+                    ["AppConfig:Uploads:ServiceImagesFolder"] = "images/services",
+                    ["AppConfig:Uploads:ProfileImageFilePrefix"] = "profile",
+                    ["AppConfig:Uploads:ServiceImageFilePrefix"] = "svc",
+                    ["AppConfig:ProviderCatalog:PredefinedCategories:0"] = "Haircut",
+                    ["AppConfig:ProviderCatalog:PredefinedCategories:1"] = "Barber"
+                })
+                .Build());
+
             _mockProviderServiceRepository = new Mock<IProviderServiceRepository>();
             _mockUserRepository = new Mock<IUserRepository>();
             _mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
@@ -36,7 +59,6 @@ namespace backend.Tests.Services.Obsolete
         [Fact]
         public async Task CreateAsync_WithValidData_ReturnsSuccess()
         {
-            // Arrange
             int providerId = 1;
             var provider = new User { Id = providerId, Role = UserRole.Provider, FirstName = "Jane", LastName = "Doe" };
             var request = new ProviderServiceRequest
@@ -51,11 +73,7 @@ namespace backend.Tests.Services.Obsolete
 
             _mockUserRepository.Setup(r => r.GetByIdAsync(providerId))
                 .ReturnsAsync(provider);
-
-            // Act
             var result = await _service.CreateAsync(providerId, request);
-
-            // Assert
             Assert.True(result.Success);
             Assert.NotNull(result.Data);
             Assert.Equal("Haircut", result.Data.Name);
@@ -65,7 +83,6 @@ namespace backend.Tests.Services.Obsolete
         [Fact]
         public async Task CreateAsync_WithTooShortDuration_ReturnsFail()
         {
-            // Arrange
             int providerId = 1;
             var provider = new User { Id = providerId, Role = UserRole.Provider };
             var request = new ProviderServiceRequest
@@ -73,16 +90,12 @@ namespace backend.Tests.Services.Obsolete
                 Name = "Service",
                 Category = "Beauty",
                 PriceEur = 50,
-                DurationMinutes = 3 // Invalid: less than 5 minutes
+                DurationMinutes = 3
             };
 
             _mockUserRepository.Setup(r => r.GetByIdAsync(providerId))
                 .ReturnsAsync(provider);
-
-            // Act
             var result = await _service.CreateAsync(providerId, request);
-
-            // Assert
             Assert.False(result.Success);
             Assert.Contains("Duration", result.Message);
         }
@@ -90,7 +103,6 @@ namespace backend.Tests.Services.Obsolete
         [Fact]
         public async Task DeleteAsync_WithValidService_ReturnsSuccess()
         {
-            // Arrange
             int providerId = 1;
             int serviceId = 100;
             var service = new ProviderService
@@ -104,11 +116,7 @@ namespace backend.Tests.Services.Obsolete
 
             _mockProviderServiceRepository.Setup(r => r.GetByIdAndProviderAsync(serviceId, providerId))
                 .ReturnsAsync(service);
-
-            // Act
             var result = await _service.DeleteAsync(providerId, serviceId);
-
-            // Assert
             Assert.True(result.Success);
             _mockProviderServiceRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
         }
@@ -116,7 +124,6 @@ namespace backend.Tests.Services.Obsolete
         [Fact]
         public async Task GetMyServicesAsync_ReturnsProviderServices()
         {
-            // Arrange
             int providerId = 1;
             var provider = new User { Id = providerId, FirstName = "John", LastName = "Doe" };
             var services = new List<ProviderService>
@@ -127,11 +134,7 @@ namespace backend.Tests.Services.Obsolete
 
             _mockProviderServiceRepository.Setup(r => r.GetByProviderActiveAsync(providerId))
                 .ReturnsAsync(services);
-
-            // Act
             var result = await _service.GetMyServicesAsync(providerId);
-
-            // Assert
             Assert.True(result.Success);
             Assert.NotNull(result.Data);
             Assert.Equal(2, result.Data.Count);
@@ -140,7 +143,6 @@ namespace backend.Tests.Services.Obsolete
         [Fact]
         public async Task SearchAsync_WithCategoryFilter_ReturnsFiltered()
         {
-            // Arrange
             var provider = new User { Id = 1, FirstName = "Jane", LastName = "Smith" };
             var services = new List<ProviderService>
             {
@@ -150,11 +152,7 @@ namespace backend.Tests.Services.Obsolete
 
             _mockProviderServiceRepository.Setup(r => r.SearchActiveAsync("Beauty", null))
                 .ReturnsAsync(services);
-
-            // Act
             var result = await _service.SearchAsync("Beauty", null);
-
-            // Assert
             Assert.True(result.Success);
             Assert.Equal(2, result.Data.Count);
         }
@@ -162,10 +160,7 @@ namespace backend.Tests.Services.Obsolete
         [Fact]
         public async Task GetCategoriesAsync_ReturnsPredefinedCategories()
         {
-            // Act
             var result = await _service.GetCategoriesAsync();
-
-            // Assert
             Assert.True(result.Success);
             Assert.NotEmpty(result.Data);
             Assert.Contains("Haircut", result.Data);
@@ -174,7 +169,6 @@ namespace backend.Tests.Services.Obsolete
         [Fact]
         public async Task GetProvidersAsync_WithFilters_ReturnsFiltered()
         {
-            // Arrange
             var providers = new List<User>
             {
                 new User
@@ -193,11 +187,7 @@ namespace backend.Tests.Services.Obsolete
 
             _mockUserRepository.Setup(r => r.GetProvidersFilteredAsync("Beauty", "Belgrade", null))
                 .ReturnsAsync(providers);
-
-            // Act
             var result = await _service.GetProvidersAsync("Beauty", "Belgrade", null, "name");
-
-            // Assert
             Assert.True(result.Success);
             Assert.Single(result.Data);
             Assert.Equal("John's Salon", result.Data[0].Name);

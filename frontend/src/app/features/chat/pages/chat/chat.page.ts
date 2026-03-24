@@ -214,9 +214,6 @@ export class ChatPage implements OnInit, OnDestroy {
         receiverId: contact.userId,
         content
       });
-      // Locally push message for snappier UI if desired, but here we wait for 'MessageReceived' event
-      // If we don't push locally, SignalR will broadcast it right back to us and we scroll then.
-      // But just in case, we can trigger a bottom scroll attempt here.
       setTimeout(() => this.scrollToBottom(), 100);
     } catch {
       this.chatService.sendMessageHttp({ receiverId: contact.userId, content }).subscribe({

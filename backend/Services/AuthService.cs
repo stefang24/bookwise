@@ -70,7 +70,7 @@ namespace backend.Services
                 Role = role,
                 CompanyName = companyName,
                 City = role == UserRole.Provider ? request.City?.Trim() : null,
-                ProfileImagePath = ProfileService.DefaultImagePath
+                ProfileImagePath = ConfigProvider.DefaultProfileImagePath
             };
 
             await _userRepository.CreateAsync(user);

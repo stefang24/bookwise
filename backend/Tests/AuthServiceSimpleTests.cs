@@ -16,7 +16,20 @@ namespace backend.Tests.Services
             ConfigProvider.Initialize(new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["JwtSettings:Secret"] = "super-secret-key-for-tests-123456789"
+                    ["JwtSettings:Secret"] = "super-secret-key-for-tests-123456789",
+                    ["AppConfig:Defaults:ProfileImagePath"] = "/images/profiles/default.png",
+                    ["AppConfig:Defaults:ServiceImagePath"] = "/images/services/default-service.svg",
+                    ["AppConfig:Uploads:MaxImageFileSizeBytes"] = "5242880",
+                    ["AppConfig:Uploads:AllowedImageExtensions:0"] = ".jpg",
+                    ["AppConfig:Uploads:AllowedImageExtensions:1"] = ".jpeg",
+                    ["AppConfig:Uploads:AllowedImageExtensions:2"] = ".png",
+                    ["AppConfig:Uploads:AllowedImageExtensions:3"] = ".gif",
+                    ["AppConfig:Uploads:AllowedImageExtensions:4"] = ".webp",
+                    ["AppConfig:Uploads:ProfileImagesFolder"] = "images/profiles",
+                    ["AppConfig:Uploads:ServiceImagesFolder"] = "images/services",
+                    ["AppConfig:Uploads:ProfileImageFilePrefix"] = "profile",
+                    ["AppConfig:Uploads:ServiceImageFilePrefix"] = "svc",
+                    ["AppConfig:ProviderCatalog:PredefinedCategories:0"] = "Haircut"
                 })
                 .Build());
         }
