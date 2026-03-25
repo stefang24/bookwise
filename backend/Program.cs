@@ -33,4 +33,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<ChatHub>("/hubs/chat");
 
+await app.SeedDefaultUsers();
+
 app.Run();

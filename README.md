@@ -99,9 +99,13 @@ Instalacija backend zavisnosti:
 ```bash
 cd backend
 dotnet restore
-dotnet ef database update
 dotnet build
 ```
+
+> **Napomena:** Pri pokretanju aplikacije tabele baze će se automatski kreirati (migracije se automatski pokreću). Takođe, kreiraće se i default nalozi za testiranje:
+> - **Korisnik:** `user@gmail.com` / `password`
+> - **Dobavljač:** `provider@gmail.com` / `password`
+> - **Admin:** `admin@gmail.com` / `password`
 
 ### 3. Frontend podešavanje
 ```bash

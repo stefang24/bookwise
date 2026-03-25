@@ -1,9 +1,11 @@
 using backend.Data;
 using backend.Helpers;
+using backend.Models;
 using backend.Repositories;
 using backend.Repositories.Interfaces;
 using backend.Services;
 using backend.Services.Interfaces;
+using BCrypt.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -131,6 +133,67 @@ namespace backend.Extensions
             });
 
             return services;
+        }
+
+        public static async Task SeedDefaultUsers(this WebApplication app)
+        {
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                await context.Database.MigrateAsync();
+
+                if (!context.Users.Any())
+                {
+                    var defaultUsers = new[]
+                    {
+                        new User
+                        {
+                            Email = "user@gmail.com",
+                            Username = "user246",
+                            FirstName = "John",
+                            LastName = "Doe",
+                            PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"),
+                            Role = UserRole.User,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new User
+                        {
+                            Email = "provider@gmail.com",
+                            Username = "provider246",
+                            FirstName = "Jane",
+                            LastName = "Provider",
+                            PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"),
+                            Role = UserRole.Provider,
+                            CompanyName = "Provider Services",
+                            PrimaryCategory = "Photography",
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new User
+                        {
+                            Email = "admin@gmail.com",
+                            Username = "admin246",
+                            FirstName = "Admin",
+                            LastName = "User",
+                            PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"),
+                            Role = UserRole.Admin,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow
+                        }
+                    };
+
+                    context.Users.AddRange(defaultUsers);
+                    await context.SaveChangesAsync();
+
+                    var sqlFilePath = Path.Combine(app.Environment.ContentRootPath, "sql", "seed_demo_data.sql");
+                    if (File.Exists(sqlFilePath))
+                    {
+                        var sql = await File.ReadAllTextAsync(sqlFilePath);
+                        await context.Database.ExecuteSqlRawAsync(sql);
+                    }
+                }
+            }
         }
     }
 }
