@@ -195,7 +195,7 @@ export class AdminDashboardPage implements OnInit {
       return 'No data';
     }
 
-    return data.bookingsByCategory.map((x) => `${x.label}: ${x.value}`).join(' | ');
+    return data.bookingsByCategory.map((x) => `${x.label}: ${x.value}`).join(' • ');
   });
 
   bookingsByDateChartData = computed<any>(() => {

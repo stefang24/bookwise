@@ -120,6 +120,10 @@
   font-size: 0.82rem;
   color: #64748b;
   margin: 0.5rem 0 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.4;
 }
 
 .link-button {
