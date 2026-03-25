@@ -1,15 +1,10 @@
-using Xunit;
-using Moq;
-using backend.Services;
-using backend.Helpers;
 using backend.DTOs;
+using backend.Helpers;
 using backend.Models;
-using backend.Repositories;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using backend.Repositories.Interfaces;
+using backend.Services;
+using Moq;
+using Xunit;
 
 namespace backend.Tests.Services.Obsolete
 {

@@ -36,7 +36,7 @@ export const routes: Routes = [
       {
         path: 'appointments',
         canActivate: [authGuard],
-        loadComponent: () => import('./features/appointments/pages/history/history.page').then(m => m.HistoryPage)
+        loadComponent: () => import('./features/appointments/pages/appointments/appointments.page').then(m => m.AppointmentsPage)
       },
       {
         path: 'chat',

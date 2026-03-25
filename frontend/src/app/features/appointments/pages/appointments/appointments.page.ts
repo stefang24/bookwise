@@ -14,13 +14,13 @@ import { NotificationService } from '../../../../shared/services/notification.se
 import { toAssetUrl } from '../../../../shared/config/api.config';
 
 @Component({
-  selector: 'app-history',
+  selector: 'app-appointments',
   imports: [FormsModule, RouterLink, DatePipe, CurrencyPipe, ButtonModule, MessageModule, ConfirmDialogModule],
   providers: [ConfirmationService],
-  templateUrl: './history.page.html',
-  styleUrl: './history.page.css'
+  templateUrl: './appointments.page.html',
+  styleUrl: './appointments.page.css'
 })
-export class HistoryPage {
+export class AppointmentsPage {
   private appointmentsService: AppointmentsService = inject(AppointmentsService);
   private authService: AuthService = inject(AuthService);
   private confirmationService: ConfirmationService = inject(ConfirmationService);

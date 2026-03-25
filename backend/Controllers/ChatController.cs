@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using backend.DTOs;
-using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using backend.Hubs;
+using backend.Services.Interfaces;
 
 namespace backend.Controllers
 {

@@ -1,8 +1,9 @@
 using backend.DTOs;
 using backend.Models;
-using backend.Repositories;
 using backend.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using backend.Repositories.Interfaces;
+using backend.Services.Interfaces;
 
 namespace backend.Services
 {
