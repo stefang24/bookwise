@@ -1,4 +1,4 @@
-﻿# BookWise - Platforma za zakazivanje usluga
+# BookWise - Service Booking Platform
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/stefang24/bookwise)
 [![Tests Status](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/stefang24/bookwise)
@@ -7,66 +7,66 @@
 [![Angular Version](https://img.shields.io/badge/Angular-21-DD0031)](https://angular.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-316192)](https://www.postgresql.org/)
 
-Moderna full-stack aplikacija za upravljanje ličnim i profesionalnim uslugama sa real-time komunikacijom, zakazivanjem termina i katalogom dobavljača usluga.
+A modern full-stack application for managing personal and professional services with real-time communication, appointment scheduling, and a service provider catalog.
 
-## Sadržaj
-- [Pregled](#pregled)
-- [Glavne mogućnosti](#glavne-mogućnosti)
-- [Vizuelni prikaz](#vizuelni-prikaz)
-- [Arhitektura](#arhitektura)
-- [Tehnologije](#tehnologije)
-- [Preduslovi](#preduslovi)
-- [Instalacija](#instalacija)
-- [Pokretanje aplikacije](#pokretanje-aplikacije)
-- [Korišćenje](#korišćenje)
-- [Struktura projekta](#struktura-projekta)
-- [Testiranje](#testiranje)
+## Table of Contents
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Visual Overview](#visual-overview)
+- [Architecture](#architecture)
+- [Technologies](#technologies)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Running the Application](#running-the-application)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Testing](#testing)
 - [Roadmap](#roadmap)
-- [Kontribucije](#kontribucije)
-- [Autori](#autori)
-- [Licenca](#licenca)
-- [Status projekta](#status-projekta)
+- [Contributing](#contributing)
+- [Authors](#authors)
+- [License](#license)
+- [Project Status](#project-status)
 
-## Pregled
+## Overview
 
-BookWise je moderna platforma za upravljanje profesionalnim uslugama koja omogućava bezbedan i efikasan rad između pružalaca usluga i korisnika. Platforma omogućava kompletno upravljanje zakazivanjem termina sa real-time komunikacijom, što čini ceo proces transparentnim i jednostavnim za sve učesnike.
+BookWise is a modern platform for managing professional services that enables secure and efficient interaction between service providers and customers. The platform provides complete appointment scheduling management with real-time communication, making the entire process transparent and straightforward for all participants.
 
-**Idealni za:** frizerske salone, fitnes centre, terapeute, konsultante, i sve vrste uslužnih delatnosti.
+**Ideal for:** hair salons, fitness centers, therapists, consultants, and all types of service businesses.
 
-### Glavne mogućnosti
+### Key Features
 
-- **Autentifikacija po ulogama** - Admin, Dobavljač, Korisnik sa JWT bezbednosnim standardima
-- **Napredni sistem zakazivanja** - Inteligentna detekcija konflikta, dostupni slotovi, kalendarski pregled
-- **Real-time chat komunikacija** - Poruke preko SignalR WebSocket sa HTTP fallback-om
-- **Katalog usluga** - Pretraga, filtriranje i pregled usluga sa detaljnim informacijama
-- **Administratorski dashboard** - Statistika, upravljanje korisnicima, nadzor platforme
-- **Upravljanje rasporedima** - Fleksibilan raspored rada sa dnevnim satima dostupnosti
-- **Push notifikacije** - Obaveštenja o zakazanim terminima i porukama
-- **Sigurnost** - JWT tokeni, BCrypt haširanje, CORS zaštita, SQL injection zaštita
+- **Role-based Authentication** - Admin, Provider, User with JWT security standards
+- **Advanced Scheduling System** - Intelligent conflict detection, available slots, calendar view
+- **Real-time Chat Communication** - Messages via SignalR WebSocket with HTTP fallback
+- **Service Catalog** - Search, filter, and browse services with detailed information
+- **Admin Dashboard** - Statistics, user management, platform monitoring
+- **Schedule Management** - Flexible work schedule with daily availability hours
+- **Push Notifications** - Alerts for scheduled appointments and messages
+- **Security** - JWT tokens, BCrypt hashing, CORS protection, SQL injection prevention
 
-## Vizuelni prikaz
+## Visual Overview
 
 ### Key User Flows
 
-**Korisnikov tok registracije i zakazivanja**
+**Customer Registration and Booking Flow**
 ```
-Registracija → Pretraga Usluga → Izbor Dobavljača → Prikaz Dostupnih Slotova 
-→ Zakazivanje → Potvrda → Chat sa Dobavljačem
-```
-
-**Dobavljačev tok upravljanja**
-```
-Registracija → Definisanje Rasporeda → Dodavanje Usluga → Čekanje Zahteva 
-→ Chat sa Klijentom → Uspešna Usluga
+Registration → Service Search → Provider Selection → View Available Slots 
+→ Book Appointment → Confirmation → Chat with Provider
 ```
 
-**Administratorski tok**
+**Provider Management Flow**
 ```
-Login → Dashboard sa Statistikom → Upravljanje Korisnicima 
-→ Pregled Transakcija → Sistem Monitoring
+Registration → Define Schedule → Add Services → Await Requests 
+→ Chat with Client → Successful Service
 ```
 
-## Arhitektura
+**Admin Flow**
+```
+Login → Statistics Dashboard → User Management 
+→ Transaction Overview → System Monitoring
+```
+
+## Architecture
 ```text
 Browser (Angular)
     |
@@ -74,21 +74,21 @@ Browser (Angular)
     v
 .NET API (ASP.NET Core)
     |
-    +-- Kontroleri
-    +-- JWT autentifikacija i autorizacija
+    +-- Controllers
+    +-- JWT Authentication & Authorization
     +-- SignalR Hub (/hubs/chat)
     |
     v
-Servisi (biznis logika)
+Services (Business Logic)
     |
     v
-Repozitorijumi + EF Core
+Repositories + EF Core
     |
     v
-PostgreSQL baza
+PostgreSQL Database
 ```
 
-## Tehnologije
+## Technologies
 
 ### Backend
 - .NET 8 (ASP.NET Core)
@@ -103,30 +103,30 @@ PostgreSQL baza
 - Angular 21 (standalone)
 - TypeScript 5.9
 - PrimeNG
-- SignalR JS klijent
+- SignalR JS Client
 - Vitest
 
-## Preduslovi
+## Prerequisites
 - .NET SDK 8+
 - Node.js 20+
 - PostgreSQL 14+
 - Git
 
-## Instalacija
+## Installation
 
-### 1. Kloniranje repozitorijuma
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/stefang24/bookwise.git
 cd bookwise
 ```
 
-### 2. Backend podešavanje
-Kreiraj bazu u PostgreSQL:
+### 2. Backend Setup
+Create the database in PostgreSQL:
 ```sql
 CREATE DATABASE bookwise_db;
 ```
 
-Podesi konekciju u backend/appsettings.Development.json:
+Configure the connection in backend/appsettings.Development.json:
 ```json
 {
   "ConnectionStrings": {
@@ -135,26 +135,26 @@ Podesi konekciju u backend/appsettings.Development.json:
 }
 ```
 
-Instalacija backend zavisnosti:
+Install backend dependencies:
 ```bash
 cd backend
 dotnet restore
 dotnet build
 ```
 
-> **Napomena:** Pri pokretanju aplikacije tabele baze će se automatski kreirati (migracije se automatski pokreću). Takođe, kreiraće se i default nalozi za testiranje:
-> - **Korisnik:** `user@gmail.com` / `password`
-> - **Dobavljač:** `provider@gmail.com` / `password`
+> **Note:** When the application starts, database tables will be created automatically (migrations run automatically). Default test accounts will also be created:
+> - **User:** `user@gmail.com` / `password`
+> - **Provider:** `provider@gmail.com` / `password`
 > - **Admin:** `admin@gmail.com` / `password`
 
-### 3. Frontend podešavanje
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
 npm run build
 ```
 
-## Pokretanje aplikacije
+## Running the Application
 
 Terminal 1 (backend):
 ```bash
@@ -168,23 +168,23 @@ cd frontend
 ng serve
 ```
 
-Aplikacija je dostupna na:
+The application is available at:
 - http://localhost:4200
 
-## Struktura projekta
-Frontend je organizovan po feature-based arhitekturi (svaka funkcionalna celina ima svoj feature modul/folder sa svojim pages/components logikom).
-Backend je organizovan kao 3-slojna arhitektura:
-- Presentation sloj: Controllers
-- Business sloj: Services
-- Data Access sloj: Repositories + Data (EF Core)
+## Project Structure
+The frontend is organized using a feature-based architecture (each functional unit has its own feature module/folder with its own pages/components logic).
+The backend is organized as a 3-layer architecture:
+- Presentation Layer: Controllers
+- Business Layer: Services
+- Data Access Layer: Repositories + Data (EF Core)
 
 ```text
 bookwise/
   backend/
-    Controllers/      # Presentation sloj
-    Services/         # Business sloj
-    Repositories/     # Data Access sloj
-    Data/             # Data Access sloj (DbContext, EF)
+    Controllers/      # Presentation Layer
+    Services/         # Business Layer
+    Repositories/     # Data Access Layer
+    Data/             # Data Access Layer (DbContext, EF)
     Models/
     Hubs/
     Program.cs
@@ -216,7 +216,7 @@ bookwise/
     angular.json
 ```
 
-## Testiranje
+## Testing
 
 Frontend:
 ```bash
@@ -230,111 +230,108 @@ cd backend
 dotnet test
 ```
 
-## Korišćenje
+## Usage
 
-### Za korisnike koji traže usluge:
+### For Users Looking for Services:
 
-1. **Registrujte se** sa email-om i šifrom
-2. **Pronađite uslugu** koristeći search i filtere (grad, kategorija, cena)
-3. **Odaberite dobavljača** i vidite detaljne informacije
-4. **Izaberite termin** iz dostupnih slotova u kalendaru
-5. **Zakazite** i pričekajte potvrdu
-6. **Komunicirajte** sa dobavljačem preko chat-a pre nego što dođe do usluge
+1. **Register** with an email and password
+2. **Find a service** using search and filters (city, category, price)
+3. **Select a provider** and view detailed information
+4. **Choose a time slot** from the available slots in the calendar
+5. **Book** and wait for confirmation
+6. **Communicate** with the provider via chat before the service takes place
 
+### For Service Providers:
 
-### Za dobavljače usluga:
+1. **Register** as a provider
+2. **Complete your profile** and add service descriptions
+3. **Set your work schedule** for each day of the week
+4. **Add services** with prices and duration
+5. **Adjust** your schedule as requests come in
+6. **Communicate** with customers via real-time chat
 
-1. **Registrujte se** kao dobavljač
-2. **Popunite profil** i dodajte opis usluga
-3. **Postavite raspored** rada za svaki dan nedelje
-4. **Dodajte usluge** sa cenama i trajanjem
-5. **Prilagođavajte** raspored kako se zahtevi primaju
-6. **Komunicirajte** sa korisnicima preko real-time chat-a
+### For Administrators:
 
-### Za administratore:
-
-1. **Prijavite se** admin nalogom
-2. **Pregledajte dashboard** sa ključnim metrikama
-3. **Upravljajte korisnicima** - blokiranje, aktivacija
-4. **Pregledajte sve termine** i transakcije
-5. **Pratite sistem** i performanse
+1. **Log in** with an admin account
+2. **View the dashboard** with key metrics
+3. **Manage users** - block, activate
+4. **Review all appointments** and transactions
+5. **Monitor the system** and performance
 
 ## Support
 
-Ako naiđete na problem ili imate pitanja:
+If you encounter a problem or have questions:
 
-- **📋 GitHub Issues:** [Otvorite issue](https://github.com/stefang24/bookwise/issues) sa detaljnim opisom problema
-- **💬 Diskusije:** Koristite [GitHub Discussions](https://github.com/stefang24/bookwise/discussions) za opšta pitanja
+- **GitHub Issues:** [Open an issue](https://github.com/stefang24/bookwise/issues) with a detailed description of the problem
+- **Discussions:** Use [GitHub Discussions](https://github.com/stefang24/bookwise/discussions) for general questions
 
 ## Roadmap
 
-### Verzija 1.0 (Trenutna)
-- [x] Kompletan sistem zakazivanja
-- [x] Real-time chat komunikacija
-- [x] Role-based autentifikacija
-- [x] Administratorski dashboard
-- [x] Upravljanje rasporedima
+### Version 1.0 (Current)
+- [x] Complete scheduling system
+- [x] Real-time chat communication
+- [x] Role-based authentication
+- [x] Admin dashboard
+- [x] Schedule management
 
-### Verzija 1.1 (Planirana)
-- [ ] Mobilna aplikacija (React Native)
-- [ ] Plaćanje online (Stripe integracija)
-- [ ] SMS notifikacije
-- [ ] Kalendar sinhronizacija (Google, Outlook)
-- [ ] Ocenjivanje i recenzije
+### Version 1.1 (Planned)
+- [ ] Mobile application (React Native)
+- [ ] Online payments (Stripe integration)
+- [ ] SMS notifications
+- [ ] Calendar sync (Google, Outlook)
+- [ ] Ratings and reviews
 
-### Verzija 1.2 (Buduće)
-- [ ] AI-powered preporuke
-- [ ] Video konsultacije
-- [ ] Multi-language podrška
-- [ ] Billing i invoicing sistem
-- [ ] Analitika i insights
+### Version 1.2 (Future)
+- [ ] AI-powered recommendations
+- [ ] Video consultations
+- [ ] Multi-language support
+- [ ] Billing and invoicing system
+- [ ] Analytics and insights
 
-## Kontribucije
+## Contributing
 
-Zahvaljujemo vam na interesovanju da doprinesete BookWise projektu! 
+Thank you for your interest in contributing to the BookWise project!
 
-### Kako da doprinesete:
+### How to Contribute:
 
-1. **Fork** repozitorijum
-2. **Kreirajte branch** za vašu feature (`git checkout -b feature/AmazingFeature`)
-3. **Commit** vaše promene (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** na branch (`git push origin feature/AmazingFeature`)
-5. **Otvorite Pull Request**
+1. **Fork** the repository
+2. **Create a branch** for your feature (`git checkout -b feature/AmazingFeature`)
+3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** to the branch (`git push origin feature/AmazingFeature`)
+5. **Open a Pull Request**
 
-### Zahtevi za Pull Request:
-- Kod mora biti konzistentan sa stilom projekta
-- Sve testove moraju da prođe (`npm run test` za frontend, `dotnet test` za backend)
-- Dodajte testove za nove funkcionalnosti
-- Ažurirajte dokumentaciju ako je potrebno
-- Pišite jasne commit poruke
+### Pull Request Requirements:
+- Code must be consistent with the project style
+- All tests must pass (`npm run test` for frontend, `dotnet test` for backend)
+- Add tests for new features
+- Update documentation if necessary
+- Write clear commit messages
 
+## Authors
 
-## Autori
+- **Stefan Grujičić** - Initial work - [GitHub](https://github.com/stefang24)
 
-- **Stefan Grujičić** - Inicijalni rad - [GitHub](https://github.com/stefang24)
+## License
 
-## Licenca
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Ovaj projekat je licenciran pod MIT licencom - pogledajte [LICENSE](LICENSE) datoteku za detalje.
+The MIT License allows you to freely use, modify, and distribute the software as long as you retain the original credit and license.
 
-MIT License dozvoljava vam da slobodno koristite, modifikujete i distribuirate softvare sve dok zadržite originalni kredit i licencu.
+## Project Status
 
-## Status projekta
+**Active**: The project is under active development.
 
-**Aktivno**: Projekat je u aktivnom razvoju. 
+Version: **1.0.0**  
+Last updated: April 2026
 
-Verzija: **1.0.0**  
-Poslednja ažuriranja: april 2026
+- All systems are operational
+- Tests are passing
+- Documentation is up to date
 
-- Svi sistemi su operativni
-- Testovi su prolazili
-- Dokumentacija je ažurna
-
-Ako želite da postanete saradnik ili održavač, molimo vas da nas kontaktirate kao što je navedeno u sekciji Support.
+If you would like to become a collaborator or maintainer, please contact us as described in the Support section.
 
 ---
 
-**Hvala što koristite BookWise!**
+**Thank you for using BookWise!**
 
-Za brže ažuriranja i vesti, pratite nas na [GitHub](https://github.com/stefang24/bookwise).
-
+For faster updates and news, follow us on [GitHub](https://github.com/stefang24/bookwise).
